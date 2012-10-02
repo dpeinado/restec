@@ -1,0 +1,13 @@
+Track your employees' time
+
+Simple, no frills pygtk application. Data is currently stored with SQLite, but could easily be ported to a heavier database.
+
+A biometric fingerprint reader is required for identification. See [fprint](http://www.reactivated.net/fprint/wiki/Main_Page) for driver support.
+
+Exports data in CSV format which is easy to import into a spreadsheet for your payroll calculations.
+
+Cheaper than commercial solutions. A decent USB-based fingerprint reader is available on EBay for less than $20.
+
+Security is your problem. No attempt is made to protect the database from tampering by anybody with some basic database skills. If you don't trust your employees, some customization will be required.
+
+git clone git://gitorious.org/employee-time-clock-with-fingerprint-reader/employee-time-clock-with-fingerprint-reader.git

@@ -1,0 +1,260 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2009 Joshua Nathaniel Pritikin
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import getopt, sys
+import pygtk
+pygtk.require('2.0')
+import gtk, pango
+import time
+import pyfprint
+import csv
+import traceback
+
+sys.path.insert(0,'lib')  # run uninstalled
+from timeclock.defs import *
+from timeclock.fprint import *
+from timeclock.punch import *
+from timeclock.addwizard import *
+
+def timestamp_to_dayminute(ts):
+    tm = ts[11:].split(':')
+    return int(tm[0])*60 + int(tm[1])
+
+def minutes_to_interval(min):
+    hr = int(min / 60)
+    return '{0}:{1:0=2d}'.format(hr, min - hr*60)
+
+def base26(col):
+    hi = int(col / 26)
+    lo = col - hi*26
+    ret = ''
+    if hi:
+        ret += chr(hi+ord('A'))
+    return ret + chr(lo+ord('A'))
+
+def output_csv(year, month, out):
+    cur = db().cursor()
+    personid = []
+    name = ['day']
+    cur.execute('select id, name from person order by lower(name)')
+    while 1:
+        row = cur.fetchone()
+        if not row: break
+        personid.append(row['id'])
+        name.append(row['name'])
+    out.writerow(name)
+
+    for day in range(1,32):
+        arrive = dict()
+        total = dict()
+        for id in personid: total[id] = 0
+        filter = "{0}-{1:0=2d}-{2:0=2d}%".format(year, month+1, day)
+        cur.execute('''select punch_who, punch_when, punch_what
+from punch where punch_when like ?''', (filter,))
+        while 1:
+            row = cur.fetchone()
+            if not row: break
+            id = row['punch_who']
+            min = timestamp_to_dayminute(row['punch_when'])
+            if row['punch_what'] == 'a':
+                arrive[id] = min
+            else:
+                total[id] += min - arrive[id]
+                arrive[id] = None
+        for id, min in arrive.items():
+            if not min: continue
+            if min > DEFAULT_LEAVE_TIME:
+                continue   # arrival after 5pm?!
+            total[id] += DEFAULT_LEAVE_TIME - min  #assume leaving at 5pm
+
+        got = map(lambda id: minutes_to_interval(total.get(id,0)), personid)
+        got.insert(0, day)
+        out.writerow(got)
+
+    sum = ['sum']
+    for r in range(0, len(personid)):
+        col = base26(r+1)
+        sum.append('=sum({0}2:{0}32)'.format(col))
+    out.writerow(sum)
+    out.writerow(['rate'])
+    pay = ['pay']
+    for r in range(0, len(personid)):
+        col = base26(r+1)
+        pay.append('={0}33*24*{0}34'.format(col))
+    out.writerow(pay)
+
+class MainGUI(object):
+    def __init__(self):
+        builder = gtk.Builder()
+        builder.add_from_file(UI_DIR+'main.ui')
+        self.win = builder.get_object('window1')
+        self.tview = builder.get_object('treeview1')
+        self.lstore = builder.get_object('liststore1')
+        self.punchstore = builder.get_object('punchstore')
+        vbox4 = builder.get_object('vbox4')
+        self.calendar = gtk.Calendar()
+        self.calendar.show()
+        self.calendar.connect_object('day-selected', MainGUI.refresh_punch, self)
+        vbox4.pack_start(self.calendar, expand=False, fill=False)
+        builder.connect_signals(self)
+
+        self.add_wiz = AddWizard()
+        self.add_wiz.win.set_transient_for(self.win)
+        self.add_wiz.win.connect_object('unmap-event',
+                                        MainGUI.refresh_roster, self)
+        self.punch = Punch()
+        self.punch.win.set_transient_for(self.win)
+        self.punch.win.connect_object('unmap-event',
+                                      MainGUI.show_new_punch, self)
+        self.refresh_roster()
+        self.refresh_punch()
+
+    def gtk_main_quit(self, *ignore):
+        gtk.main_quit()
+        return True
+
+    def wiz_enroll(self, ign):
+        self.add_wiz.show()
+
+    def punch_cb(self, ign):
+        cur = db().cursor()
+        cur.execute('SELECT print_id, print_owner, print_data FROM print')
+        id = []
+        owner = []
+        gallary = []
+        for row in cur.fetchall():
+            data = pyfprint.pyf.fp_print_data_from_data(str(row['print_data']))
+            gallary.append(pyfprint.Fprint(data_ptr = data))
+            id.append(row['print_id'])
+            owner.append(row['print_owner'])
+        n, fp = identify_finger(gallary)
+        if fp:
+            self.punch.run(owner[n], id[n])
+        else:
+            msg = '''Your finger was not recognized.
+Please try again.'''
+            dialog = gtk.MessageDialog(parent = self.win,
+                                       buttons = gtk.BUTTONS_OK,
+                                       message_format = msg)
+            dialog.run()
+            dialog.destroy()
+
+    def refresh_roster(self, *ign):
+        # TODO: Better to make the minimum number of changes instead
+        self.lstore.clear()
+        cur = db().cursor()
+        cur.execute('SELECT name FROM person ORDER BY lower(name)')
+        for row in cur.fetchall():
+            self.lstore.append((row['name'],))
+
+    def refresh_punch(self, *ign):
+        year, month, day = self.calendar.get_date()
+        date = "{0}-{1:0=2d}-{2:0=2d}%".format(year, month+1, day)
+        # TODO: If date didn't change,
+        # better to make the minimum number of changes instead
+        self.punchstore.clear()
+        cur = db().cursor()
+        cur.execute('''SELECT person.name AS name, punch_when, punch_what, punch_comment
+FROM punch p
+JOIN person ON (p.punch_who = person.id)
+WHERE punch_when like ?
+ORDER BY punch_when DESC''', (date,))
+        while 1:
+            row = cur.fetchone()
+            if not row: break
+            if row['punch_what'] == DEPART_CODE:
+                what ='depart'
+            else:
+                what = 'arrive'
+            when = time.strptime(row['punch_when'], '%Y-%m-%dT%H:%M')
+            self.punchstore.append((row['name'],
+                                    time.strftime('%I:%M %p', when),
+                                    what, row['punch_comment']))
+
+    def show_new_punch(self, *ign):
+        now = time.localtime()
+        self.calendar.select_month(now.tm_mon-1, now.tm_year)
+        self.calendar.select_day(now.tm_mday)
+
+    def add_scan_cb(self, ign):
+        # hack in a way to add scans; TODO unhack this
+        model, iter = self.tview.get_selection().get_selected()
+        if iter:
+            who = model.get_value(iter, 0)
+            fp, img = safe_enroll()
+            if isinstance(fp, pyfprint.Fprint):
+                cur = db().cursor()
+                cur.execute('select id from person where name = ?', (who,))
+                id = cur.fetchone()['id']
+                insert_scan(id, fp, img)
+                db().commit()
+                msg = 'Fingerprint scan added to {0}.'.format(who)
+                dialog = gtk.MessageDialog(parent = self.win,
+                                           buttons = gtk.BUTTONS_OK,
+                                           message_format = msg)
+                dialog.run()
+                dialog.destroy()
+
+    def export(self, ign):
+        dialog = gtk.FileChooserDialog(title='Export', parent=self.win,
+                                       action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                                       buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                                gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT))
+        dialog.set_do_overwrite_confirmation(True)
+        year, month, day = self.calendar.get_date()
+        dialog.set_current_name("{0}-{1:0=2d}.csv".format(year, month+1))
+        if dialog.run() == gtk.RESPONSE_ACCEPT:
+            try:
+                out = csv.writer(open(dialog.get_filename(), 'w'))
+                output_csv(year, month, out)
+            except:
+                msg = reduce(lambda x, y: x+y,
+                             traceback.format_exception(*sys.exc_info()))
+                mdialog = gtk.MessageDialog(parent = self.win,
+                                           buttons = gtk.BUTTONS_OK,
+                                           message_format = msg)
+                mdialog.run()
+                mdialog.destroy()
+        dialog.destroy()
+
+def usage():
+    print("timeclock [-f]")
+    print("-d path, --database=path  specify a path to the database")
+    print("-f, --fake                don't require a fingerprint reader")
+    sys.exit(2)
+
+if __name__ == "__main__":
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "fd:", ["fake", 'database'])
+    except getopt.GetoptError as err:
+        print(err)
+        usage()
+
+    path = None
+    for o, a in opts:
+        if o in ('-f', '--fake'):
+            enable_simulation()
+        elif o in ('-d', '--database'):
+            path = a
+        else:
+            assert False, "unhandled option"
+
+    install_schema(path)
+
+    gui = MainGUI()
+    gui.win.show()
+    gtk.main()
