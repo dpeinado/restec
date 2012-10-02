@@ -1,0 +1,18 @@
+'''
+Created on 02/10/2012
+
+@author: bicho
+'''
+import MySQLdb
+
+class myDb(object):
+    '''
+    classdocs
+    '''
+
+
+    def __init__(selfparams):
+        '''
+        Constructor
+        '''
+        

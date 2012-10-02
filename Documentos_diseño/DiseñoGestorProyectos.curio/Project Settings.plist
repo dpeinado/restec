@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AutoSave</key>
+	<true/>
+	<key>FiguresToJumps</key>
+	<data>
+	BAtzdHJlYW10eXBlZIHoA4QBQISEhBNOU011dGFibGVEaWN0aW9uYXJ5AISEDE5TRGlj
+	dGlvbmFyeQCEhAhOU09iamVjdACFhAFpAIY=
+	</data>
+	<key>FormatVersion</key>
+	<integer>2</integer>
+	<key>JumpsToTargets</key>
+	<data>
+	BAtzdHJlYW10eXBlZIHoA4QBQISEhBNOU011dGFibGVEaWN0aW9uYXJ5AISEDE5TRGlj
+	dGlvbmFyeQCEhAhOU09iamVjdACFhAFpAIY=
+	</data>
+	<key>UUID</key>
+	<string>B7392501-6F3B-490D-B1FD-A58404D16EEE</string>
+</dict>
+</plist>

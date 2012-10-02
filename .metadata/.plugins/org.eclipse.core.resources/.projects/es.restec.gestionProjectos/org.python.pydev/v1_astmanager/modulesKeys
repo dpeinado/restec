@@ -1,0 +1,5 @@
+MODULES_MANAGER_V2
+cliente.Tarea|/Users/bicho/restec/es.restec.gestionProjectos/src/cliente/Tarea.py
+cliente.__init__|/Users/bicho/restec/es.restec.gestionProjectos/src/cliente/__init__.py
+servidor.__init__|/Users/bicho/restec/es.restec.gestionProjectos/src/servidor/__init__.py
+servidor.myDb|/Users/bicho/restec/es.restec.gestionProjectos/src/servidor/myDb.py

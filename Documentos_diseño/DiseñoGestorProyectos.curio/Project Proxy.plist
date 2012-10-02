@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Interesting Figures</key>
+	<array>
+		<dict>
+			<key>Asset Type</key>
+			<string>FigureContainer</string>
+			<key>Asset UUID</key>
+			<string>67F49F4C-713C-4201-8268-397678F8AE2A</string>
+			<key>ChecksAreVisible</key>
+			<true/>
+			<key>Drawing UUID</key>
+			<string>549DAB43-E7DB-429D-83E8-B58CD7A3B0EA</string>
+			<key>Figure UUID</key>
+			<string>0FD98B01-F689-41DC-A331-7041FDAD0442</string>
+			<key>Percent Complete</key>
+			<integer>0</integer>
+			<key>Priority</key>
+			<integer>0</integer>
+			<key>Rating</key>
+			<integer>0</integer>
+			<key>Start Date</key>
+			<date>2012-10-01T22:00:00Z</date>
+			<key>Tag UUIDs</key>
+			<array/>
+			<key>Title</key>
+			<string>Mind Map - clase: myDbManager</string>
+			<key>User Flag Indicies</key>
+			<array/>
+		</dict>
+	</array>
+</dict>
+</plist>

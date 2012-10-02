@@ -1,0 +1,61 @@
+-- VERSION_3
+-- START DISKCACHE
+/Users/bicho/restec/.metadata/.plugins/org.eclipse.core.resources/.projects/cars_example/com.python.pydev.analysis/v1_indexcache
+.v1_indexcache
+car_registration|0|/Users/bicho/restec/cars_example/src/car_registration.py
+car_registration_server|0|/Users/bicho/restec/cars_example/src/car_registration_server.py
+Console|0|/Users/bicho/restec/cars_example/src/Console.py
+-- END DISKCACHE
+-- START DICTIONARY
+11
+11=SocketManager.__enter__
+10=RequestHandler
+5=Car
+2=car_registration
+4=SocketManager
+6=Car.mileage
+3=car_registration_server
+9=SocketManager.__init__
+8=Car.__init__
+1=Console
+7=Car.owner
+-- END DICTIONARY
+-- START TREE 1
+16
+_ra|1|_RangeError!9@
+add|1|Address!19@
+car|3|CarTuple!19@CarRegistrationServer!25@Car!25@
+cha|2|change_mileage!18@change_owner!18@
+fin|1|Finish!25@
+get|8|get_float!10@get_menu_choice!10@get_date!10@get_string!10@get_bool!10@get_license_list!18@get_integer!10@get_car_details!18@
+han|1|handle_request!18@
+loa|1|load!26@
+mai|2|main!26@main!18@
+new|1|new_registration!18@
+qui|1|quit!18@
+req|1|RequestHandler!25@
+ret|1|retrieve_car_details!18@
+sav|1|save!26@
+soc|1|SocketManager!17@
+sto|1|stop_server!18@
+-- END TREE
+-- START TREE 2
+17
+__e|2|__exit__!4&18@__enter__!4&18@
+__i|2|__init__!5&26@__init__!4&18@
+__m|1|__mileage!6&27@
+__o|1|__owner!7&27@
+__s|1|__seats!8&27@
+add|1|address!9&19@
+cal|2|Call!10&27@CallLock!10&27@
+car|1|CarsLock!10&27@
+cha|2|change_mileage!10&26@change_owner!10&26@
+get|2|get_license_list!10&26@get_car_details!10&26@
+han|1|handle!10&26@
+mil|2|mileage!5&26@mileage!8&27@
+new|1|new_registration!10&26@
+own|2|owner!5&26@owner!8&27@
+sea|1|seats!5&26@
+shu|1|shutdown!10&26@
+soc|1|sock!11&19@
+-- END TREE
