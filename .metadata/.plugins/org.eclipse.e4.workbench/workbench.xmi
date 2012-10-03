@@ -5,7 +5,7 @@
     <tags>topLevel</tags>
     <tags>shellMaximized</tags>
     <children xsi:type="basic:PartSashContainer" xmi:id="_c7XqUAsqEeKZisgCGBdseQ" selectedElement="_c7XqUQsqEeKZisgCGBdseQ" horizontal="true">
-      <children xsi:type="advanced:PerspectiveStack" xmi:id="_c7XqUQsqEeKZisgCGBdseQ" elementId="PerspectiveStack" containerData="7500" selectedElement="_Q5DSgAsrEeKZisgCGBdseQ">
+      <children xsi:type="advanced:PerspectiveStack" xmi:id="_c7XqUQsqEeKZisgCGBdseQ" elementId="PerspectiveStack" containerData="7500" selectedElement="_PrsHgAsrEeKZisgCGBdseQ">
         <children xsi:type="advanced:Perspective" xmi:id="_PrsHgAsrEeKZisgCGBdseQ" elementId="org.python.pydev.ui.PythonPerspective" selectedElement="_PrsHgQsrEeKZisgCGBdseQ" label="PyDev" iconURI="platform:/plugin/org.python.pydev/icons/python_16x16.png">
           <persistedState key="persp.hiddenItems" value="persp.hideToolbarSC:org.eclipse.debug.ui.commands.RunToLine,persp.hideToolbarSC:org.eclipse.jdt.ui.actions.OpenProjectWizard,persp.hideToolbarSC:org.eclipse.ui.edit.text.toggleShowSelectedElementOnly,"/>
           <tags>persp.actionSet:org.eclipse.mylyn.context.ui.actionSet</tags>
@@ -49,14 +49,14 @@
               <children xsi:type="advanced:Placeholder" xmi:id="_PrsHgwsrEeKZisgCGBdseQ" elementId="org.python.pydev.navigator.view" ref="_PrqSUAsrEeKZisgCGBdseQ"/>
             </children>
             <children xsi:type="basic:PartSashContainer" xmi:id="_PrsHhAsrEeKZisgCGBdseQ" containerData="8131" selectedElement="_PrsHiQsrEeKZisgCGBdseQ">
-              <children xsi:type="basic:PartSashContainer" xmi:id="_PrsHhQsrEeKZisgCGBdseQ" containerData="7500" selectedElement="_PrsHhgsrEeKZisgCGBdseQ" horizontal="true">
+              <children xsi:type="basic:PartSashContainer" xmi:id="_PrsHhQsrEeKZisgCGBdseQ" containerData="6230" selectedElement="_PrsHhgsrEeKZisgCGBdseQ" horizontal="true">
                 <children xsi:type="advanced:Placeholder" xmi:id="_PrsHhgsrEeKZisgCGBdseQ" elementId="org.eclipse.ui.editorss" containerData="7500" ref="_dFxjgAsqEeKZisgCGBdseQ"/>
                 <children xsi:type="basic:PartStack" xmi:id="_PrsHhwsrEeKZisgCGBdseQ" elementId="org.eclipse.ui.views.ContentOutlineMStack" containerData="2500" selectedElement="_PrsHiAsrEeKZisgCGBdseQ">
                   <tags>newtablook</tags>
                   <children xsi:type="advanced:Placeholder" xmi:id="_PrsHiAsrEeKZisgCGBdseQ" elementId="org.eclipse.ui.views.ContentOutline" ref="_dGdgAAsqEeKZisgCGBdseQ"/>
                 </children>
               </children>
-              <children xsi:type="basic:PartStack" xmi:id="_PrsHiQsrEeKZisgCGBdseQ" elementId="bottom" containerData="2500" selectedElement="_PrsHjAsrEeKZisgCGBdseQ">
+              <children xsi:type="basic:PartStack" xmi:id="_PrsHiQsrEeKZisgCGBdseQ" elementId="bottom" containerData="3770" selectedElement="_PrsHjAsrEeKZisgCGBdseQ">
                 <tags>newtablook</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_PrsHigsrEeKZisgCGBdseQ" elementId="org.eclipse.ui.views.ProblemView" ref="_dGbDwAsqEeKZisgCGBdseQ"/>
                 <children xsi:type="advanced:Placeholder" xmi:id="_PrsHiwsrEeKZisgCGBdseQ" elementId="org.eclipse.search.ui.views.SearchView" toBeRendered="false" ref="_Prq5YAsrEeKZisgCGBdseQ"/>
@@ -114,9 +114,9 @@
           <tags>persp.actionSet:org.python.pydev.exceptionBreakpoints</tags>
           <tags>persp.showIn:org.eclipse.ui.views.ContentOutline</tags>
           <tags>persp.actionSet:org.python.pydev.pyPropertyTrace</tags>
-          <children xsi:type="basic:PartSashContainer" xmi:id="_Q5DSgQsrEeKZisgCGBdseQ" selectedElement="_Q5D5kAsrEeKZisgCGBdseQ">
-            <children xsi:type="basic:PartSashContainer" xmi:id="_Q5D5kAsrEeKZisgCGBdseQ" containerData="7500" selectedElement="_Q5D5kQsrEeKZisgCGBdseQ">
-              <children xsi:type="basic:PartSashContainer" xmi:id="_Q5D5kQsrEeKZisgCGBdseQ" containerData="4500" selectedElement="_Q5D5kgsrEeKZisgCGBdseQ" horizontal="true">
+          <children xsi:type="basic:PartSashContainer" xmi:id="_Q5DSgQsrEeKZisgCGBdseQ" selectedElement="_Q5EgoQsrEeKZisgCGBdseQ">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_Q5D5kAsrEeKZisgCGBdseQ" containerData="7500" selectedElement="_Q5D5nAsrEeKZisgCGBdseQ">
+              <children xsi:type="basic:PartSashContainer" xmi:id="_Q5D5kQsrEeKZisgCGBdseQ" containerData="4500" selectedElement="_Q5D5lQsrEeKZisgCGBdseQ" horizontal="true">
                 <children xsi:type="basic:PartStack" xmi:id="_Q5D5kgsrEeKZisgCGBdseQ" elementId="org.eclipse.debug.internal.ui.NavigatorFolderView" containerData="5000" selectedElement="_Q5D5kwsrEeKZisgCGBdseQ">
                   <tags>newtablook</tags>
                   <tags>org.eclipse.e4.primaryNavigationStack</tags>
@@ -182,20 +182,10 @@
       <tags>categoryTag:Help</tags>
     </sharedElements>
     <sharedElements xsi:type="advanced:Area" xmi:id="_dFxjgAsqEeKZisgCGBdseQ" elementId="org.eclipse.ui.editorss" selectedElement="_dFxjgQsqEeKZisgCGBdseQ">
-      <children xsi:type="basic:PartStack" xmi:id="_dFxjgQsqEeKZisgCGBdseQ" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_ih0nEAyLEeKf3OhAhtn08g">
+      <children xsi:type="basic:PartStack" xmi:id="_dFxjgQsqEeKZisgCGBdseQ" elementId="org.eclipse.e4.primaryDataStack">
         <tags>newtablook</tags>
         <tags>org.eclipse.e4.primaryDataStack</tags>
         <tags>EditorStack</tags>
-        <children xsi:type="basic:Part" xmi:id="_eHyEsAyLEeKf3OhAhtn08g" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="servidor" iconURI="platform:/plugin/org.python.pydev/icons/python_file.gif" tooltip="es.restec.gestionProjectos/src/servidor/__init__.py" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/es.restec.gestionProjectos/src/servidor/__init__.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;0&quot; selectionTopPixel=&quot;0&quot;/>&#xA;&lt;/editor>"/>
-          <tags>Editor</tags>
-          <tags>removeOnHide</tags>
-        </children>
-        <children xsi:type="basic:Part" xmi:id="_ih0nEAyLEeKf3OhAhtn08g" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="myDb" iconURI="platform:/plugin/org.python.pydev/icons/python_file.gif" tooltip="es.restec.gestionProjectos/src/servidor/myDb.py" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.python.pydev.editor.PythonEditor&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/es.restec.gestionProjectos/src/servidor/myDb.py&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;1234&quot; selectionTopPixel=&quot;0&quot;/>&#xA;&lt;/editor>"/>
-          <tags>Editor</tags>
-          <tags>removeOnHide</tags>
-        </children>
       </children>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_dGXZYAsqEeKZisgCGBdseQ" elementId="org.eclipse.ui.navigator.ProjectExplorer" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Project Explorer" iconURI="platform:/plugin/org.eclipse.ui.navigator.resources//icons/full/eview16/resource_persp.gif" tooltip="Workspace" closeable="true">
@@ -220,7 +210,7 @@
       <tags>categoryTag:General</tags>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_dGbDwAsqEeKZisgCGBdseQ" elementId="org.eclipse.ui.views.ProblemView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Problems" iconURI="platform:/plugin/org.eclipse.ui.ide//icons/full/eview16/problems_view.gif" tooltip="0 items" closeable="true">
-      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view PRIMARY_SORT_FIELD=&quot;org.eclipse.ui.ide.severityAndDescriptionField&quot; categoryGroup=&quot;org.eclipse.ui.ide.severity&quot; markerContentGenerator=&quot;org.eclipse.ui.ide.problemsGenerator&quot; partName=&quot;Problems&quot;>&#xA;&lt;columnWidths org.eclipse.ui.ide.locationField=&quot;90&quot; org.eclipse.ui.ide.markerType=&quot;90&quot; org.eclipse.ui.ide.pathField=&quot;120&quot; org.eclipse.ui.ide.resourceField=&quot;90&quot; org.eclipse.ui.ide.severityAndDescriptionField=&quot;300&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.severityAndDescriptionField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.resourceField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.pathField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.locationField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.markerType&quot;/>&#xA;&lt;/view>"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view PRIMARY_SORT_FIELD=&quot;org.eclipse.ui.ide.severityAndDescriptionField&quot; categoryGroup=&quot;org.eclipse.ui.ide.severity&quot; markerContentGenerator=&quot;org.eclipse.ui.ide.problemsGenerator&quot; partName=&quot;Problems&quot;>&#xA;&lt;expanded>&#xA;&lt;category IMemento.internal.id=&quot;Errors (1 item)&quot;/>&#xA;&lt;/expanded>&#xA;&lt;columnWidths org.eclipse.ui.ide.locationField=&quot;90&quot; org.eclipse.ui.ide.markerType=&quot;90&quot; org.eclipse.ui.ide.pathField=&quot;120&quot; org.eclipse.ui.ide.resourceField=&quot;90&quot; org.eclipse.ui.ide.severityAndDescriptionField=&quot;300&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.severityAndDescriptionField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.resourceField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.pathField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.locationField&quot;/>&#xA;&lt;visible IMemento.internal.id=&quot;org.eclipse.ui.ide.markerType&quot;/>&#xA;&lt;/view>"/>
       <tags>View</tags>
       <tags>categoryTag:General</tags>
       <menus xmi:id="_dW_2YAsqEeKZisgCGBdseQ" elementId="org.eclipse.ui.views.ProblemView">
@@ -266,7 +256,7 @@
       <tags>categoryTag:Mylyn</tags>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_PrqSUAsrEeKZisgCGBdseQ" elementId="org.python.pydev.navigator.view" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="PyDev Package Explorer" iconURI="platform:/plugin/org.python.pydev/icons/pydev_package_explorer.gif" tooltip="Workspace" closeable="true">
-      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;0&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/cars_example&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/cars_example/src&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/cars_example/src/car_registration_server.py&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos/src&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos/src/cliente&quot;/>&#xA;&lt;/view>"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;0&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/cars_example&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/cars_example/src&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/cars_example/src/car_registration_server.py&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos/src&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos/src/cliente&quot;/>&#xA;&lt;expanded IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos/src/servidor&quot;/>&#xA;&lt;selected IMemento.internal.id=&quot;/Users/bicho/restec/es.restec.gestionProjectos/src/servidor/myDb.py&quot;/>&#xA;&lt;/view>"/>
       <tags>View</tags>
       <tags>categoryTag:PyDev</tags>
       <menus xmi:id="_PsZSIAsrEeKZisgCGBdseQ" elementId="org.python.pydev.navigator.view">
@@ -355,6 +345,20 @@
     </trimBars>
     <trimBars xmi:id="_dsMDQAsqEeKZisgCGBdseQ" elementId="org.eclipse.ui.trim.vertical1" toBeRendered="false" side="Left">
       <children xsi:type="menu:ToolControl" xmi:id="_dsMqUAsqEeKZisgCGBdseQ" elementId="PerspectiveStack(minimized)" toBeRendered="false" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.TrimStack">
+        <tags>TrimStack</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_1fDuEA1EEeKSlaO2kh22eA" elementId="topLeft(org.python.pydev.ui.PythonPerspective)" toBeRendered="false" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.TrimStack">
+        <tags>TrimStack</tags>
+      </children>
+    </trimBars>
+    <trimBars xmi:id="_wwUHAA1EEeKSlaO2kh22eA" elementId="org.eclipse.ui.trim.vertical2" toBeRendered="false" side="Right">
+      <children xsi:type="menu:ToolControl" xmi:id="_wwVVIA1EEeKSlaO2kh22eA" elementId="bottom(org.python.pydev.ui.PythonPerspective)" toBeRendered="false" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.TrimStack">
+        <tags>TrimStack</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_1fOtMA1EEeKSlaO2kh22eA" elementId="org.eclipse.ui.views.ContentOutlineMStack(org.python.pydev.ui.PythonPerspective)" toBeRendered="false" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.TrimStack">
+        <tags>TrimStack</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_1fWpAA1EEeKSlaO2kh22eA" elementId="org.eclipse.ui.editorss(org.python.pydev.ui.PythonPerspective)" toBeRendered="false" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.TrimStack">
         <tags>TrimStack</tags>
       </children>
     </trimBars>
