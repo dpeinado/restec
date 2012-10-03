@@ -1,9 +1,10 @@
+use proyectos;
 CREATE TABLE IF NOT EXISTS Cargas(
 	IdCarga INT AUTO_INCREMENT,
 	IdRecurso INT NOT NULL,
 	IdProyecto int not null,
 	IdFase int not null,
-	horas real not null,
+	segundos real not null,
 	creation_time DATETIME NULL,
 	update_time DATETIME NULL,
 	primary key(IdCarga),
@@ -35,7 +36,7 @@ end;
 |
 delimiter ;
 
-insert into Cargas(IdRecurso,IdProyecto,IdFase,horas) values('1','2','2','33.5');
-insert into Cargas(IdRecurso,IdProyecto,IdFase,horas) values('2','1','1','3.5');
-insert into Cargas(IdRecurso,IdProyecto,IdFase,horas) values('1','2','2','4.5');
-insert into Cargas(IdRecurso,IdProyecto,IdFase,horas) values('1','3','3','13.5');
+insert into Cargas(IdRecurso,IdProyecto,IdFase,segundos) values('1','2','2','33.5');
+insert into Cargas(IdRecurso,IdProyecto,IdFase,segundos) values('2','1','1','3.5');
+insert into Cargas(IdRecurso,IdProyecto,IdFase,segundos) values('1','2','2','4.5');
+insert into Cargas(IdRecurso,IdProyecto,IdFase,segundos) values('1','3','3','13.5');

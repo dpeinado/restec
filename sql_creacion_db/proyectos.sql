@@ -1,9 +1,10 @@
+use proyectos;
 CREATE TABLE IF NOT EXISTS Proyectos(
 	IdProyecto INT AUTO_INCREMENT, 
     Codigo CHAR(3) not null, 
     Descripcion varchar(45) not null,
     PRIMARY KEY(IdProyecto)
-) ENGINE=INNODB;
+) ENGINE=INNODB character set utf8;
 
 INSERT INTO Proyectos(Codigo,Descripcion) VALUES('001', 'Torre InNova S');
 INSERT INTO Proyectos(Codigo,Descripcion) VALUES('002', 'Tanques InTega');
@@ -14,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Recursos(
     Nombre VARCHAR(45) not null, 
     Coste real,
     PRIMARY KEY(IdRecurso)
-) ENGINE=INNODB;
+) ENGINE=INNODB character set utf8;
 
 INSERT INTO Recursos(Nombre,Coste) VALUES('Diego Peinado', '25.0');
 INSERT INTO Recursos(Nombre,Coste) VALUES('Israel Durán', '20.0');
@@ -24,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Fases(
 	IdFase INT AUTO_INCREMENT, 
     Fase VARCHAR(45) not null, 
     PRIMARY KEY(IdFase)
-) ENGINE=INNODB;
+) ENGINE=INNODB character set utf8;
 
 INSERt INTO Fases(Fase) VALUES ('Diseño preliminar');
 INSERt INTO Fases(Fase) VALUES ('Diseño Detallado');
