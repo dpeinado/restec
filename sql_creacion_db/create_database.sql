@@ -1,6 +1,6 @@
 drop database if exists proyectos;
 create database proyectos character set 'UTF8';
-grant all on proyectos.* to 'puser'@'localhost';
+grant all on proyectos.* to 'puser'@'localhost' identified by 'pu8549';
 use proyectos;
 
 CREATE TABLE IF NOT EXISTS Proyectos(
@@ -63,4 +63,5 @@ end;
 delimiter ;
 
 load data infile '/Users/bicho/restec/sql_creacion_db/proyectos.txt' into table proyectos fields terminated by '\t' (Codigo, Descripcion) set IdProyecto = NULL;
-
+load data infile '/Users/bicho/restec/sql_creacion_db/recursos.txt' into table recursos fields terminated by '\t' (Nombre, Coste) set IdRecurso = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/fases.txt' into table fases fields terminated by '\t' (Fase) set IdFase = NULL;
