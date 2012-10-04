@@ -11,6 +11,10 @@ import sys
 class myDb(object):
     '''
     Clase mi base de datos. Se encarga de interaccionar con la base de datos MySql
+    FALTA IMPLEMENTAR CONSULTAS CON PERIODOS DE FECHAS. QUIZÁ LO MEJOR ES COJER
+    get_task_list QUE HASTA AHORA SOLO TIENE UN PARAMETRO (TIPO DE INFORME), CON 
+    DOS PARÁMETROS OPCIONALES: FECHA INICIO, FECHA FINAL, E INCLUIR EN LA CONSULTA 
+    EN INTERVALO DE FECHAS
     '''
         
     def __init__(self,host,user,userpwd,database):
@@ -31,7 +35,7 @@ class myDb(object):
                                    charset="utf8",
                                    use_unicode=True)
         except MySQLdb.Error, e:
-                print "Error %d: %s" % (e.args[0], e.args[1])
+                print "Error {0}".format(e)
                 sys.exit (1)
                 
     def disconnect(self):
@@ -39,8 +43,9 @@ class myDb(object):
             self.__conn.commit()
             self.__conn.close()
         except MySQLdb.Error, e:
-                print "Error %d: %s" % (e.args[0], e.args[1])
+                print "Error {0}".format(e)
                 sys.exit (1)
+    
     def get_project_list(self):
         try:
             cur=self.__conn.cursor()
@@ -50,7 +55,7 @@ class myDb(object):
             cabeceras = tuple([cab[0] for cab in desc])
             return (True,(cabeceras,rows))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
             return (False, ("Error en get_project_list",))
         finally:
             if cur:
@@ -65,7 +70,7 @@ class myDb(object):
             cabeceras = tuple([cab[0] for cab in desc])
             return (True,(cabeceras,rows))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
             return (False, ("Error en get_resource_list",))
         finally:
             if cur:
@@ -80,7 +85,7 @@ class myDb(object):
             cabeceras = tuple([cab[0] for cab in desc])
             return (True,(cabeceras,rows))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
             return (False, ("Error en get_activities_list",))
         finally:
             if cur:
@@ -91,7 +96,9 @@ class myDb(object):
                 1, Resource,Project,Activity
                 2, Resource,Project,
                 3, Project, Activity
-                4, Project"""
+                4, Project
+                5, Project, Resource
+                6, Project, Resource, Activity"""
         try:
             cur=self.__conn.cursor()
             if grouping == 0:
@@ -124,6 +131,19 @@ class myDb(object):
                     from Proyectos, Cargas 
                     where Proyectos.idProyecto=Cargas.idProyecto
                     group by Cargas.IdProyecto""")
+            elif grouping == 5:
+                cur.execute("""select Codigo, descripcion, nombre, SUM(segundos)
+                    from Proyectos, recursos, Cargas 
+                    where Proyectos.idProyecto=Cargas.idProyecto
+                    and recursos.idrecurso = Cargas.idrecurso
+                    group by Cargas.IdProyecto, Cargas.IdRecurso""")
+            elif grouping == 6:
+                cur.execute("""select Codigo, descripcion, nombre, fase, SUM(segundos)
+                    from recursos, Proyectos, fases, Cargas 
+                    where recursos.Idrecurso=Cargas.IdRecurso 
+                    and Proyectos.idProyecto=Cargas.idProyecto
+                    and fases.idfase = Cargas.idfase
+                    group by Cargas.IdProyecto, Cargas.IdRecurso, Cargas.IdFase""")                   
                 
             desc = cur.description
             rows = cur.fetchall()
@@ -144,7 +164,7 @@ class myDb(object):
             cabeceras = tuple([cab[0] for cab in desc])
             return (True,(cabeceras,rows))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
             return (False, ("Error en get_task_raw_list",))
         finally:
             if cur:
@@ -153,72 +173,101 @@ class myDb(object):
         try:
             cur=self.__conn.cursor()
             cur.execute ("INSERT INTO Proyectos(Codigo,Descripcion) VALUES(%s,%s)",(Codigo,Descripcion))
+            self.__conn.commit()
             return (True, ("Insertado nuevo proyecto",))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
+            self.__conn.rollback()
             return (False, ("Error en set_new_project",))
-        
+        finally:
+            if cur:
+                cur.close()
+
     def set_new_resource(self, Nombre, Coste):
         try:
             cur=self.__conn.cursor()
             cur.execute ("INSERT INTO Recursos(Nombre, Coste) VALUES(%s,%s)",(Nombre,Coste))
+            self.__conn.commit()
             return (True, ("Insertado nuevo recurso",))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
+            self.__conn.rollback()
             return (False, ("Error en set_new_resource",))
+        finally:
+            if cur:
+                cur.close()
+                
+                
     def set_new_activity(self, Fase):
         try:
             cur=self.__conn.cursor()
             cur.execute ("INSERT INTO Fases(Fase) VALUES(%s)",(Fase))
+            self.__conn.commit()
             return (True, ("Insertado nueva fase",))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print "Error {0}".format(e)
+            self.__conn.rollback()
             return (False, ("Error en set_new_activity",))
+        finally:
+            if cur:
+                cur.close()
 
     def set_new_task(self, IdRecurso,IdProyecto,IdFase,segundos):
         try:
             cur=self.__conn.cursor()
             cur.execute ("""INSERT INTO Cargas(IdRecurso,IdProyecto,IdFase,segundos) 
             VALUES(%s,%s,%s,%s)""",(IdRecurso,IdProyecto,IdFase,segundos))
+            self.__conn.commit()
             return (True, ("Insertado nueva Carga",))
         except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
-            return (False, ("Error en set_new_activity",))
+            print "Error {0}".format(e)
+            self.__conn.rollback()
+            return (False, ("Error en set_new_task",))
+        finally:
+            if cur:
+                cur.close()
 
-def print_tuples(data):
-    for detail in data[0]:
-        print detail, "\t",
-    print
-    for row in data[1]:
-        for detail in row:
-            print detail, "\t",
-        print    
-        
-def main():
-    InPr = myDb('localhost', 'puser','pu8549','proyectos')
-    InPr.connect()
-    print "me conecté"
 
-    for i in range(10):
-        ok,lista = InPr.set_new_task('2', '1', '5', '400')
-        
-    for i in range(7):
-        ok,lista = InPr.set_new_task('2', '5', '4', '308')
-
-    for i in range(10):
-        ok,lista = InPr.set_new_task('3', '5', '6', '285')
- 
-    ok,lista = InPr.get_task_list(0)
-    print_tuples(lista)
-    ok,lista = InPr.get_task_list(1)
-    print_tuples(lista)
-    ok,lista = InPr.get_task_list(2)
-    print_tuples(lista)
-    ok,lista = InPr.get_task_list(3)
-    print_tuples(lista)
-    ok,lista = InPr.get_task_list(4)
-    print_tuples(lista)
-   
-    InPr.disconnect()
-    print "me desconecté"
-main()
+#===============================================================================
+# def print_tuples(data):
+#   for detail in data[0]:
+#       print detail, "\t",
+#   print
+#   for row in data[1]:
+#       for detail in row:
+#           print detail, "\t",
+#       print    
+#       
+# def main():
+#   InPr = myDb('localhost', 'puser','pu8549','proyectos')
+#   InPr.connect()
+#   print "me conecté"
+# 
+#   for i in range(10):
+#       ok,lista = InPr.set_new_task('2', '1', '5', '400')
+#       
+#   for i in range(7):
+#       ok,lista = InPr.set_new_task('2', '5', '4', '308')
+# 
+#   for i in range(10):
+#       ok,lista = InPr.set_new_task('3', '5', '6', '285')
+# 
+#   ok,lista = InPr.get_task_list(0)
+#   print_tuples(lista)
+#   ok,lista = InPr.get_task_list(1)
+#   print_tuples(lista)
+#   ok,lista = InPr.get_task_list(2)
+#   print_tuples(lista)
+#   ok,lista = InPr.get_task_list(3)
+#   print_tuples(lista)
+#   ok,lista = InPr.get_task_list(4)
+#   print_tuples(lista)
+#   ok,lista = InPr.get_task_list(5)
+#   print_tuples(lista)
+#   ok,lista = InPr.get_task_list(6)
+#   print_tuples(lista)
+#    
+#   InPr.disconnect()
+#   print "me desconecté"
+# main()
+#===============================================================================

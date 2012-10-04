@@ -5,7 +5,7 @@
 	<key>549DAB43-E7DB-429D-83E8-B58CD7A3B0EA</key>
 	<dict>
 		<key>Visible Rect</key>
-		<string>{{220, 467}, {949, 667}}</string>
+		<string>{{0, 354}, {949, 667}}</string>
 		<key>Zoom Factor</key>
 		<real>1</real>
 	</dict>
@@ -83,7 +83,7 @@
 		</dict>
 	</dict>
 	<key>Main RBSplitView Layout</key>
-	<string>3 135.058H 963.999 280</string>
+	<string>3 135.058H 964 280</string>
 	<key>Normal Window Layout</key>
 	<string>{{0, 0}, {1245, 778}}</string>
 	<key>Organizer RBSplitView Layout</key>
