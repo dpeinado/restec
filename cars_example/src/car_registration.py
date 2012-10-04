@@ -18,6 +18,8 @@ import Console
 
 
 Address = ["localhost", 9653]
+
+
 CarTuple = collections.namedtuple("CarTuple", "seats mileage owner")
 
 

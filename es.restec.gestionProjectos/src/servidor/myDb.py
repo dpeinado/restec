@@ -227,47 +227,47 @@ class myDb(object):
             if cur:
                 cur.close()
 
-
 #===============================================================================
+# 
 # def print_tuples(data):
-#   for detail in data[0]:
-#       print detail, "\t",
-#   print
-#   for row in data[1]:
-#       for detail in row:
-#           print detail, "\t",
-#       print    
-#       
+#  for detail in data[0]:
+#      print detail, "\t",
+#  print
+#  for row in data[1]:
+#      for detail in row:
+#          print detail, "\t",
+#      print    
+#      
 # def main():
-#   InPr = myDb('localhost', 'puser','pu8549','proyectos')
-#   InPr.connect()
-#   print "me conecté"
+#  InPr = myDb('localhost', 'puser','pu8549','proyectos')
+#  InPr.connect()
+#  print "me conecté"
 # 
-#   for i in range(10):
-#       ok,lista = InPr.set_new_task('2', '1', '5', '400')
-#       
-#   for i in range(7):
-#       ok,lista = InPr.set_new_task('2', '5', '4', '308')
+#  for i in range(10):
+#      ok,lista = InPr.set_new_task('2', '1', '5', '400')
+#      
+#  for i in range(7):
+#      ok,lista = InPr.set_new_task('2', '5', '4', '308')
 # 
-#   for i in range(10):
-#       ok,lista = InPr.set_new_task('3', '5', '6', '285')
+#  for i in range(10):
+#      ok,lista = InPr.set_new_task('3', '5', '6', '285')
 # 
-#   ok,lista = InPr.get_task_list(0)
-#   print_tuples(lista)
-#   ok,lista = InPr.get_task_list(1)
-#   print_tuples(lista)
-#   ok,lista = InPr.get_task_list(2)
-#   print_tuples(lista)
-#   ok,lista = InPr.get_task_list(3)
-#   print_tuples(lista)
-#   ok,lista = InPr.get_task_list(4)
-#   print_tuples(lista)
-#   ok,lista = InPr.get_task_list(5)
-#   print_tuples(lista)
-#   ok,lista = InPr.get_task_list(6)
-#   print_tuples(lista)
-#    
-#   InPr.disconnect()
-#   print "me desconecté"
+#  ok,lista = InPr.get_task_list(0)
+#  print_tuples(lista)
+#  ok,lista = InPr.get_task_list(1)
+#  print_tuples(lista)
+#  ok,lista = InPr.get_task_list(2)
+#  print_tuples(lista)
+#  ok,lista = InPr.get_task_list(3)
+#  print_tuples(lista)
+#  ok,lista = InPr.get_task_list(4)
+#  print_tuples(lista)
+#  ok,lista = InPr.get_task_list(5)
+#  print_tuples(lista)
+#  ok,lista = InPr.get_task_list(6)
+#  print_tuples(lista)
+#   
+#  InPr.disconnect()
+#  print "me desconecté"
 # main()
 #===============================================================================
