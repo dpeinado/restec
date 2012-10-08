@@ -6,7 +6,7 @@ Created on 02/10/2012
 '''
 
 import MySQLdb
-import sys
+#import sys
 
 class myDb(object):
     '''
@@ -34,18 +34,23 @@ class myDb(object):
                                    db = self.__database,
                                    charset="utf8",
                                    use_unicode=True)
+            return True
         except MySQLdb.Error, e:
                 print "Error {0}".format(e)
-                sys.exit (1)
+                return False
                 
     def disconnect(self):
         try:
             self.__conn.commit()
             self.__conn.close()
+            self.__conn = None
+            return True
         except MySQLdb.Error, e:
                 print "Error {0}".format(e)
-                sys.exit (1)
-    
+                return False
+            
+    def conn(self):
+        return self.__conn
     def get_project_list(self):
         try:
             cur=self.__conn.cursor()
@@ -172,6 +177,13 @@ class myDb(object):
     def set_new_project(self, Codigo, Descripcion):
         try:
             cur=self.__conn.cursor()
+            cur.execute("SELECT * from Proyectos WHERE Codigo = %s", (Codigo,))
+            if cur.rowcount > 0:
+                return (False, ("Proyecto existente con este mismo código",))
+            cur.execute("SELECT * from Proyectos WHERE Descripcion LIKE %s", (Descripcion,))
+            if cur.rowcount > 0:
+                return (False, ("Proyecto existente con esta misma descripción",))
+            # Parece que no existe un proyecto igual ... luego inserto
             cur.execute ("INSERT INTO Proyectos(Codigo,Descripcion) VALUES(%s,%s)",(Codigo,Descripcion))
             self.__conn.commit()
             return (True, ("Insertado nuevo proyecto",))
@@ -186,6 +198,10 @@ class myDb(object):
     def set_new_resource(self, Nombre, Coste):
         try:
             cur=self.__conn.cursor()
+            cur.execute("SELECT * from Recursos WHERE Nombre LIKE %s", (Nombre,))
+            if cur.rowcount > 0:
+                return (False, ("Recurso existente con este mismo Nombre",))
+            # Parece que no existe un recurso igual ... luego inserto
             cur.execute ("INSERT INTO Recursos(Nombre, Coste) VALUES(%s,%s)",(Nombre,Coste))
             self.__conn.commit()
             return (True, ("Insertado nuevo recurso",))
@@ -201,6 +217,10 @@ class myDb(object):
     def set_new_activity(self, Fase):
         try:
             cur=self.__conn.cursor()
+            cur.execute("SELECT * from Fases WHERE Fase LIKE %s", (Fase,))
+            if cur.rowcount > 0:
+                return (False, ("Fase existente con este mismo Nombre",))
+            # Parece que no existe una fase igual ... luego inserto            
             cur.execute ("INSERT INTO Fases(Fase) VALUES(%s)",(Fase))
             self.__conn.commit()
             return (True, ("Insertado nueva fase",))

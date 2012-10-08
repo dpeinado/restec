@@ -53,17 +53,31 @@ def handle_request( *items, **kwargs):
 
 
 def print_tuples(data):
-    for detail in data[0]:
-        print detail, "\t",
-    print
-    for row in data[1]:
-        for detail in row:
+    cuantos=len(data)
+    if cuantos ==1:
+        print data[0]
+    else:
+        for detail in data[0]:
             print detail, "\t",
-        print    
+        print
+        for row in data[1]:
+            for detail in row:
+                print detail, "\t",
+            print    
 
 def main():
-    ok, data = handle_request("GET_PROJECT_LIST")
+    ok, data = handle_request("SET_NEW_PROJECT", '145', 'Torre InNOVa S 2')
     if(ok):
-        print_tuples(data)
+       print_tuples(data)
+    else:
+        print "Error: ", data[0]
+    #===========================================================================
+    # ok, data = handle_request("SET_NEW_RESOURCE", 'Paco Martinez Soria', '12.5')
+    # if(ok):
+    #   print_tuples(data)                                          
+    # 
+    # ok = handle_request("SHUTDOWN_SERVER",wait_for_reply=False)
+    #===========================================================================
+
         
 main()

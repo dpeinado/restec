@@ -19,7 +19,24 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
     Call = dict(
         GET_PROJECT_LIST=(
             lambda self, *args: self.server.myDataBase.get_project_list(*args)),
-            )    
+        GET_RESOURCE_LIST=(
+            lambda self, *args: self.server.myDataBase.get_resource_list(*args)),
+        GET_ACTIVITY_LIST=(
+            lambda self, *args: self.server.myDataBase.get_activity_list(*args)),
+        GET_TASK_LIST=(
+            lambda self, *args: self.server.myDataBase.get_task_list(*args)),
+        GET_TASK_RAW_LIST=(
+            lambda self, *args: self.server.myDataBase.get_task_raw_list(*args)),
+        SET_NEW_PROJECT=(
+            lambda self, *args: self.server.myDataBase.set_new_project(*args)),
+        SET_NEW_RESOURCE=(
+            lambda self, *args: self.server.myDataBase.set_new_resource(*args)),
+        SET_NEW_ACTIVITY=(
+            lambda self, *args: self.server.myDataBase.set_new_activity(*args)),
+        SET_NEW_TASK=(
+            lambda self, *args: self.server.myDataBase.set_new_task(*args)),                
+        SHUTDOWN_SERVER=lambda self, *args: self.shutdown(*args)
+        )
     
     def handle(self):
         SizeStruct = struct.Struct("!I")
@@ -28,9 +45,6 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
         data = pickle.loads(self.rfile.read(size))
 
         try:
-            #===================================================================
-            # with self.CallLock:
-            #===================================================================
             function = self.Call[data[0]]
             reply = function(self, *data[1:])
         except Finish:
@@ -38,7 +52,13 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
         data = pickle.dumps(reply, 0)
         self.wfile.write(SizeStruct.pack(len(data)))
         self.wfile.write(data)
-
+        
+        
+    def shutdown(self, *ignore):
+        self.server.shutdown()
+        self.server.myDataBase.disconnect()
+        raise Finish()
+        
 
 class ThreadServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
@@ -49,11 +69,18 @@ def main():
     user = 'puser'
     userpwd = 'pu8549'
     database = 'proyectos'
-    
-    server = ThreadServer((host,port), MyDbServerManagerRequestHandler)
-    server.myDataBase=myDb.myDb('localhost', 'puser','pu8549','proyectos')
-    server.myDataBase.connect()
-    print "Server a la escucha"
-    server.serve_forever()
-    
+    try:
+        server = ThreadServer((host,port), MyDbServerManagerRequestHandler)
+        server.myDataBase=myDb.myDb('localhost', 'puser','pu8549','proyectos')
+        server.myDataBase.connect()
+        print "Server a la escucha"
+        server.serve_forever()
+    except Exception as err:
+        print("ERROR", err)
+    finally:
+        print "Estoy en Finally"
+        if server is not None:
+            server.shutdown()
+
+
 main()
