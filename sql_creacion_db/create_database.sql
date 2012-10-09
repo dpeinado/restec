@@ -1,67 +1,79 @@
-drop database if exists proyectos;
-create database proyectos character set 'UTF8';
-grant all on proyectos.* to 'puser'@'localhost' identified by 'pu8549';
-use proyectos;
+drop database if exists projects;
+create database projects character set 'UTF8';
+grant all on projects.* to 'puser'@'localhost' identified by 'pu8549';
+use projects;
 
-CREATE TABLE IF NOT EXISTS Proyectos(
-	IdProyecto INT AUTO_INCREMENT, 
-    Codigo CHAR(3) not null, 
-    Descripcion varchar(45) not null,
-    PRIMARY KEY(IdProyecto)
+CREATE TABLE IF NOT EXISTS Projects(
+	IdProject INT AUTO_INCREMENT, 
+    Code CHAR(3) not null, 
+    Description varchar(45) not null,
+    PRIMARY KEY(IdProject)
 ) ENGINE=INNODB character set utf8;
 
-CREATE TABLE IF NOT EXISTS Recursos(
-	IdRecurso INT AUTO_INCREMENT, 
-    Nombre VARCHAR(45) not null, 
-    Coste real,
-    PRIMARY KEY(IdRecurso)
+CREATE TABLE IF NOT EXISTS Resources(
+	IdResource INT AUTO_INCREMENT, 
+    Name VARCHAR(45) not null, 
+    Cost real,
+    PRIMARY KEY(IdResource)
 ) ENGINE=INNODB character set utf8;
 
-
-CREATE TABLE IF NOT EXISTS Fases(
-	IdFase INT AUTO_INCREMENT, 
-    Fase VARCHAR(45) not null, 
-    PRIMARY KEY(IdFase)
+CREATE TABLE IF NOT EXISTS Tasks(
+	IdTask INT AUTO_INCREMENT,
+	IdProjectParent INT NOT NULL,
+	IdTaskParent INT,
+	Task VARCHAR(150),
+	PRIMARY KEY(IdTask),
+	foreign key(IdProjectParent)
+	references Projects(IdProject)
+	on update cascade
 ) ENGINE=INNODB character set utf8;
 
-CREATE TABLE IF NOT EXISTS Cargas(
-	IdCarga INT AUTO_INCREMENT,
-	IdRecurso INT NOT NULL,
-	IdProyecto int not null,
-	IdFase int not null,
-	segundos real not null,
+CREATE TABLE IF NOT EXISTS Activities(
+	IdActivity INT AUTO_INCREMENT, 
+    Activity VARCHAR(45) not null, 
+    PRIMARY KEY(IdActivity)
+) ENGINE=INNODB character set utf8;
+
+CREATE TABLE IF NOT EXISTS Entries(
+	IdEntry INT AUTO_INCREMENT,
+	IdResource INT NOT NULL,
+	IdProject int not null,
+	IdTask int,
+	IdActivity int not null,
+	Tsec real not null,
 	creation_time DATETIME NULL,
 	update_time DATETIME NULL,
-	primary key(IdCarga),
-	foreign key(IdRecurso)
-	references Recursos(IdRecurso)
+	primary key(IdEntry),
+	foreign key(IdResource)
+	references Resources(IdResource)
 	on update cascade
 	on delete cascade,
-	foreign key(IdProyecto) 
-	references Proyectos(IdProyecto)
+	foreign key(IdProject) 
+	references Projects(IdProject)
 	on update cascade
 	on delete cascade,
-	foreign key(IdFase)
-	references Fases(IdFase)
+	foreign key(IdActivity)
+	references Activities(IdActivity)
 	on update cascade
 	on delete cascade
 ) engine=innodb character set utf8;
 
 
 delimiter |
-CREATE TRIGGER Carga_INSERT BEFORE INSERT ON Cargas
+CREATE TRIGGER Entry_INSERT BEFORE INSERT ON Entries
 for each row begin
 	set new.creation_time = now();
 	set new.update_time = now();
 end;
 
-CREATE TRIGGER Carta_UPDATE BEFORE UPDATE ON Cargas
+CREATE TRIGGER Entry_UPDATE BEFORE UPDATE ON Entries
 for each row begin
 	set new.update_time = now();
 end;
 |
 delimiter ;
 
-load data infile '/Users/bicho/restec/sql_creacion_db/proyectos.txt' into table proyectos fields terminated by '\t' (Codigo, Descripcion) set IdProyecto = NULL;
-load data infile '/Users/bicho/restec/sql_creacion_db/recursos.txt' into table recursos fields terminated by '\t' (Nombre, Coste) set IdRecurso = NULL;
-load data infile '/Users/bicho/restec/sql_creacion_db/fases.txt' into table fases fields terminated by '\t' (Fase) set IdFase = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/projects.txt' into table Projects fields terminated by '\t' (Code, Description) set IdProject = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/resources.txt' into table Resources fields terminated by '\t' (Name, Cost) set IdResource = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/activities.txt' into table Activities fields terminated by '\t' (Activity) set IdActivity = NULL;
+

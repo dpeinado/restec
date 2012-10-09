@@ -54,7 +54,7 @@ class myDb(object):
     def get_project_list(self):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Proyectos")
+            cur.execute("SELECT * from Projects")
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
@@ -65,11 +65,24 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()
+                               
+    def get_project_byId(self, IdProject):
+        try:
+            cur=self.__conn.cursor()
+            cur.execute("SELECT * from Projects WHERE IdProject = %s", (IdProject,))
+            row = cur.fetchone()
+            return (True,row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_project_byId", IdProject))
+        finally:
+            if cur:
+                cur.close()                
     
     def get_resource_list(self):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Recursos")
+            cur.execute("SELECT * from Resources")
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
@@ -80,11 +93,24 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()
+    
+    def get_resource_byId(self, IdResource):
+        try:
+            cur=self.__conn.cursor()
+            cur.execute("SELECT * from Resources WHERE IdResource = %s", (IdResource,))
+            row = cur.fetchone()
+            return (True,row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_resource_byId", IdResource))
+        finally:
+            if cur:
+                cur.close()    
  
     def get_activity_list(self):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Fases")
+            cur.execute("SELECT * from Activities")
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
@@ -95,7 +121,49 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()
-    def get_task_list(self, grouping):
+                
+    def get_activity_byId(self, IdResource):
+        try:
+            cur=self.__conn.cursor()
+            cur.execute("SELECT * from Activities WHERE IdActivity = %s", (IdResource,))
+            row = cur.fetchone()
+            return (True,row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_activity_byId", IdResource))
+        finally:
+            if cur:
+                cur.close()    
+
+    def get_task_list(self, IdProject):
+        try:
+            cur=self.__conn.cursor()
+            cur.execute("SELECT * from Tasks WHERE IdProjectParent = %s", (IdProject,))
+            desc = cur.description
+            rows = cur.fetchall()
+            cabeceras = tuple([cab[0] for cab in desc])
+            return (True,(cabeceras,rows))
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_Task_list",))
+        finally:
+            if cur:
+                cur.close()
+                
+    def get_task_byId(self, IdProject, IdTask):
+        try:
+            cur=self.__conn.cursor()
+            cur.execute("SELECT * from Tasks WHERE IdTask = %s and IdProjectParent = %s", (IdTask,IdProject))
+            row = cur.fetchone()
+            return (True,row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_task_byId", IdTask))
+        finally:
+            if cur:
+                cur.close()    
+    
+    def get_entries_list(self, grouping):
         """Grouping:
                 0, no grouping at all
                 1, Resource,Project,Activity
@@ -107,48 +175,48 @@ class myDb(object):
         try:
             cur=self.__conn.cursor()
             if grouping == 0:
-                cur.execute("""select nombre, Codigo, descripcion, fase, segundos, creation_time, 
-                    update_time from recursos, Proyectos, fases, Cargas 
-                    where recursos.Idrecurso=Cargas.IdRecurso 
-                    and Proyectos.idProyecto=Cargas.idProyecto
-                    and fases.idfase = Cargas.idfase""")
+                cur.execute("""select Name, Code, Description, Activity, Tsec, creation_time, 
+                    update_time from Resources, Projects, Activities, Entries 
+                    where Resources.IdResource=Entries.IdResource 
+                    and Projects.IdProject=Entries.IdProject
+                    and Activities.IdActivity = Entries.IdActivity""")
             elif grouping == 1:
-                cur.execute("""select nombre, Codigo, descripcion, fase, SUM(segundos)
-                    from recursos, Proyectos, fases, Cargas 
-                    where recursos.Idrecurso=Cargas.IdRecurso 
-                    and Proyectos.idProyecto=Cargas.idProyecto
-                    and fases.idfase = Cargas.idfase
-                    group by Cargas.IdRecurso, Cargas.IdProyecto, Cargas.IdFase""")                
+                cur.execute("""select Name, Code, Description, Activity, SUM(Tsec)
+                    from Resources, Projects, Activities, Entries 
+                    where Resources.IdResource=Entries.IdResource 
+                    and Projects.idProject=Entries.idProject
+                    and Activities.idActivity = Entries.idActivity
+                    group by Entries.IdResource, Entries.IdProject, Entries.IdActivity""")                
             elif grouping == 2:
-                cur.execute("""select nombre, Codigo, descripcion, SUM(segundos)
-                    from recursos, Proyectos, Cargas 
-                    where recursos.Idrecurso=Cargas.IdRecurso 
-                    and Proyectos.idProyecto=Cargas.idProyecto
-                    group by Cargas.IdRecurso, Cargas.IdProyecto""")
+                cur.execute("""select Name, Code, Description, SUM(Tsec)
+                    from Resources, Projects, Entries 
+                    where Resources.IdResource=Entries.IdResource 
+                    and Projects.idProject=Entries.idProject
+                    group by Entries.IdResource, Entries.IdProject""")
             elif grouping == 3:
-                cur.execute("""select Codigo, descripcion, fase, SUM(segundos)
-                    from Proyectos, fases, Cargas 
-                    where Proyectos.idProyecto=Cargas.idProyecto
-                    and fases.idfase = Cargas.idfase
-                    group by Cargas.IdProyecto, Cargas.IdFase""")
+                cur.execute("""select Code, Description, Activity, SUM(Tsec)
+                    from Projects, Activities, Entries 
+                    where Projects.idProject=Entries.idProject
+                    and Activitys.idActivity = Entries.idActivity
+                    group by Entries.IdProject, Entries.IdActivity""")
             elif grouping == 4:
-                cur.execute("""select Codigo, descripcion, SUM(segundos)
-                    from Proyectos, Cargas 
-                    where Proyectos.idProyecto=Cargas.idProyecto
-                    group by Cargas.IdProyecto""")
+                cur.execute("""select Code, Description, SUM(Tsec)
+                    from Projects, Entries 
+                    where Projects.idProject=Entries.idProject
+                    group by Entries.IdProject""")
             elif grouping == 5:
-                cur.execute("""select Codigo, descripcion, nombre, SUM(segundos)
-                    from Proyectos, recursos, Cargas 
-                    where Proyectos.idProyecto=Cargas.idProyecto
-                    and recursos.idrecurso = Cargas.idrecurso
-                    group by Cargas.IdProyecto, Cargas.IdRecurso""")
+                cur.execute("""select Code, Description, Name, SUM(Tsec)
+                    from Projects, Resources, Entries 
+                    where Projects.idProject=Entries.idProject
+                    and Resources.idResource = Entries.idResource
+                    group by Entries.IdProject, Entries.IdResource""")
             elif grouping == 6:
-                cur.execute("""select Codigo, descripcion, nombre, fase, SUM(segundos)
-                    from recursos, Proyectos, fases, Cargas 
-                    where recursos.Idrecurso=Cargas.IdRecurso 
-                    and Proyectos.idProyecto=Cargas.idProyecto
-                    and fases.idfase = Cargas.idfase
-                    group by Cargas.IdProyecto, Cargas.IdRecurso, Cargas.IdFase""")                   
+                cur.execute("""select Code, Description, Name, Activity, SUM(Tsec)
+                    from Resources, Projects, Activities, Entries 
+                    where Resources.IdResource=Entries.IdResource 
+                    and Projects.idProject=Entries.idProject
+                    and Activitys.idActivity = Entries.idActivity
+                    group by Entries.IdProject, Entries.IdResource, Entries.IdActivity""")                   
                 
             desc = cur.description
             rows = cur.fetchall()
@@ -156,35 +224,36 @@ class myDb(object):
             return (True,(cabeceras,rows))
         except MySQLdb.Error, e:
             print "Error {0}".format(e.args)
-            return (False, ("Error en get_task_list",))
+            return (False, ("Error en get_entries_list",))
         finally:
             if cur:
                 cur.close()    
-    def get_task_raw_list(self):
+    def get_entries_raw_list(self):
         try:
             cur=self.__conn.cursor()
-            cur.execute("select * from Cargas")
+            cur.execute("select * from Entries")
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
             return (True,(cabeceras,rows))
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
-            return (False, ("Error en get_task_raw_list",))
+            return (False, ("Error en get_entries_raw_list",))
         finally:
             if cur:
                 cur.close()
-    def set_new_project(self, Codigo, Descripcion):
+                
+    def set_new_project(self, Code, Description):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Proyectos WHERE Codigo = %s", (Codigo,))
+            cur.execute("SELECT * from Projects WHERE Code = %s", (Code,))
             if cur.rowcount > 0:
                 return (False, ("Proyecto existente con este mismo código",))
-            cur.execute("SELECT * from Proyectos WHERE Descripcion LIKE %s", (Descripcion,))
+            cur.execute("SELECT * from Projects WHERE Description LIKE %s", (Description,))
             if cur.rowcount > 0:
                 return (False, ("Proyecto existente con esta misma descripción",))
             # Parece que no existe un proyecto igual ... luego inserto
-            cur.execute ("INSERT INTO Proyectos(Codigo,Descripcion) VALUES(%s,%s)",(Codigo,Descripcion))
+            cur.execute ("INSERT INTO Projects(Code,Description) VALUES(%s,%s)",(Code,Description))
             self.__conn.commit()
             return (True, ("Insertado nuevo proyecto",))
         except MySQLdb.Error, e:
@@ -194,15 +263,14 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()
-
-    def set_new_resource(self, Nombre, Coste):
+    def set_new_resource(self, Name, Cost):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Recursos WHERE Nombre LIKE %s", (Nombre,))
+            cur.execute("SELECT * from Resources WHERE Name LIKE %s", (Name,))
             if cur.rowcount > 0:
                 return (False, ("Recurso existente con este mismo Nombre",))
             # Parece que no existe un recurso igual ... luego inserto
-            cur.execute ("INSERT INTO Recursos(Nombre, Coste) VALUES(%s,%s)",(Nombre,Coste))
+            cur.execute ("INSERT INTO Resources(Name, Cost) VALUES(%s,%s)",(Name,Cost))
             self.__conn.commit()
             return (True, ("Insertado nuevo recurso",))
         except MySQLdb.Error, e:
@@ -214,14 +282,14 @@ class myDb(object):
                 cur.close()
                 
                 
-    def set_new_activity(self, Fase):
+    def set_new_activity(self, Activity):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Fases WHERE Fase LIKE %s", (Fase,))
+            cur.execute("SELECT * from Activities WHERE Activity LIKE %s", (Activity,))
             if cur.rowcount > 0:
                 return (False, ("Fase existente con este mismo Nombre",))
             # Parece que no existe una fase igual ... luego inserto            
-            cur.execute ("INSERT INTO Fases(Fase) VALUES(%s)",(Fase))
+            cur.execute ("INSERT INTO Fases(Fase) VALUES(%s)",(Activity,))
             self.__conn.commit()
             return (True, ("Insertado nueva fase",))
         except MySQLdb.Error, e:
@@ -232,13 +300,23 @@ class myDb(object):
             if cur:
                 cur.close()
 
-    def set_new_task(self, IdRecurso,IdProyecto,IdFase,segundos):
+    def set_new_task(self, IdProjectParent, IdTaskParent, Task):
         try:
             cur=self.__conn.cursor()
-            cur.execute ("""INSERT INTO Cargas(IdRecurso,IdProyecto,IdFase,segundos) 
-            VALUES(%s,%s,%s,%s)""",(IdRecurso,IdProyecto,IdFase,segundos))
+            cur.execute("SELECT * from Tasks WHERE Task LIKE %s and IdProjectParent = %s", (Task,IdProjectParent))
+            if cur.rowcount > 0:
+                return (False, ("Tarea existente con este mismo Nombre en el mismo proyecto",))
+            # Parece que no existe una fase igual ... luego inserto
+            cur.execute("SELECT * from Projects where IdProject = %s",(IdProjectParent,))
+            if cur.rowcount == 0:
+                return (False, ("Error IdProjectParent Inexistente",))
+            if IdTaskParent is not None:
+                cur.execute("SELECT * from Tasks where IdTask = %s",(IdTaskParent,))
+                if cur.rowcount == 0:
+                    return (False, ("Error IdTaskParent Inexistente",))
+            cur.execute ("INSERT INTO Tasks(IdProjectParent,IdTaskParent,Task) VALUES(%s,%s,%s)",(IdProjectParent,IdTaskParent,Task))
             self.__conn.commit()
-            return (True, ("Insertado nueva Carga",))
+            return (True, ("Insertado nueva fase",))
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             self.__conn.rollback()
@@ -247,47 +325,69 @@ class myDb(object):
             if cur:
                 cur.close()
 
+    def set_new_entry(self, IdResource,IdProject,IdActivity,Tsec, IdTask=None):
+        try:
+            cur=self.__conn.cursor()
+            if IdTask is not None:
+                cur.execute ("""INSERT INTO Entries(IdResource,IdProject,IdTask,IdActivity,Tsec) 
+                    VALUES(%s,%s,%s,%s)""",(IdResource,IdProject,IdTask, IdActivity,Tsec))
+            else:
+                cur.execute ("""INSERT INTO Entries(IdResource,IdProject,IdActivity,Tsec) 
+                    VALUES(%s,%s,%s,%s)""",(IdResource,IdProject,IdActivity,Tsec))          
+            self.__conn.commit()
+            return (True, ("Insertado nueva Entrada",))
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            self.__conn.rollback()
+            return (False, ("Error en set_new_entry",))
+        finally:
+            if cur:
+                cur.close()
+
 #===============================================================================
 # 
 # def print_tuples(data):
-#  for detail in data[0]:
-#      print detail, "\t",
-#  print
-#  for row in data[1]:
-#      for detail in row:
-#          print detail, "\t",
-#      print    
-#      
+# for detail in data[0]:
+#     print detail, "\t",
+# print
+# for row in data[1]:
+#     for detail in row:
+#         print detail, "\t",
+#     print    
+#     
 # def main():
-#  InPr = myDb('localhost', 'puser','pu8549','proyectos')
-#  InPr.connect()
-#  print "me conecté"
+# InPr = myDb('localhost', 'puser','pu8549','projects')
+# InPr.connect()
+# print "me conecté"
 # 
-#  for i in range(10):
-#      ok,lista = InPr.set_new_task('2', '1', '5', '400')
-#      
-#  for i in range(7):
-#      ok,lista = InPr.set_new_task('2', '5', '4', '308')
+# #ok, lista = InPr.set_new_task('1', None, 'Esta es una tarea con TaskParent = None') 
+# ok, lista = InPr.set_new_task('102', '2', 'Esta es una tarea con TaskParent = 2')
+# print_tuples(lista)
+# for i in range(10):
+#    ok,lista = InPr.set_new_task('2', '1', '5', '400')
+#    
+# for i in range(7):
+#    ok,lista = InPr.set_new_task('2', '5', '4', '308')
 # 
-#  for i in range(10):
-#      ok,lista = InPr.set_new_task('3', '5', '6', '285')
+# for i in range(10):
+#    ok,lista = InPr.set_new_task('3', '5', '6', '285')
 # 
-#  ok,lista = InPr.get_task_list(0)
-#  print_tuples(lista)
-#  ok,lista = InPr.get_task_list(1)
-#  print_tuples(lista)
-#  ok,lista = InPr.get_task_list(2)
-#  print_tuples(lista)
-#  ok,lista = InPr.get_task_list(3)
-#  print_tuples(lista)
-#  ok,lista = InPr.get_task_list(4)
-#  print_tuples(lista)
-#  ok,lista = InPr.get_task_list(5)
-#  print_tuples(lista)
-#  ok,lista = InPr.get_task_list(6)
-#  print_tuples(lista)
-#   
-#  InPr.disconnect()
-#  print "me desconecté"
+# ok,lista = InPr.get_task_list(0)
+# print_tuples(lista)
+# ok,lista = InPr.get_task_list(1)
+# print_tuples(lista)
+# ok,lista = InPr.get_task_list(2)
+# print_tuples(lista)
+# ok,lista = InPr.get_task_list(3)
+# print_tuples(lista)
+# ok,lista = InPr.get_task_list(4)
+# print_tuples(lista)
+# ok,lista = InPr.get_task_list(5)
+# print_tuples(lista)
+# ok,lista = InPr.get_task_list(6)
+# print_tuples(lista)
+#  
+# InPr.disconnect()
+# print "me desconecté"
 # main()
 #===============================================================================

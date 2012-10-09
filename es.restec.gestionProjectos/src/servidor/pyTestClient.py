@@ -71,13 +71,11 @@ def main():
        print_tuples(data)
     else:
         print "Error: ", data[0]
-    #===========================================================================
-    # ok, data = handle_request("SET_NEW_RESOURCE", 'Paco Martinez Soria', '12.5')
-    # if(ok):
-    #   print_tuples(data)                                          
-    # 
-    # ok = handle_request("SHUTDOWN_SERVER",wait_for_reply=False)
-    #===========================================================================
+    ok, data = handle_request("SET_NEW_RESOURCE", 'Paco Martinez Soria', '12.5')
+    if(ok):
+      print_tuples(data)                                          
+    
+    ok = handle_request("SHUTDOWN_SERVER",wait_for_reply=False)
 
         
 main()
