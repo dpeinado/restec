@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//src/cliente/MainForm.py=utf-8
 encoding//src/cliente/ui_mainform.py=utf-8
 encoding//src/servidor/myDb.py=utf-8
 encoding//src/servidor/pyTestServer.py=utf-8

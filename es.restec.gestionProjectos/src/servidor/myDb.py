@@ -163,6 +163,24 @@ class myDb(object):
             if cur:
                 cur.close()    
     
+    def get_task_entries_timeTotal(self,IdResource,IdProject,IdActivity,IdTask=None):
+        try:
+            cur=self.__conn.cursor()
+            if IdTask is not None:
+                cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
+                        IdActivity = %s and IdTask = %s""",(IdResource,IdProject,IdActivity,IdTask))
+            else:
+                cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
+                        IdActivity = %s""",(IdResource,IdProject,IdActivity))
+            row = cur.fetchone()
+            return (True,row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_task_entries_timeTotal"))
+        finally:
+            if cur:
+                cur.close()    
+    
     def get_entries_list(self, grouping):
         """Grouping:
                 0, no grouping at all
@@ -330,7 +348,7 @@ class myDb(object):
             cur=self.__conn.cursor()
             if IdTask is not None:
                 cur.execute ("""INSERT INTO Entries(IdResource,IdProject,IdTask,IdActivity,Tsec) 
-                    VALUES(%s,%s,%s,%s)""",(IdResource,IdProject,IdTask, IdActivity,Tsec))
+                    VALUES(%s,%s,%s,%s,%s)""",(IdResource,IdProject,IdTask, IdActivity,Tsec))
             else:
                 cur.execute ("""INSERT INTO Entries(IdResource,IdProject,IdActivity,Tsec) 
                     VALUES(%s,%s,%s,%s)""",(IdResource,IdProject,IdActivity,Tsec))          

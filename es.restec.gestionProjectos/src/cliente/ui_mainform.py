@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainform.ui'
 #
-# Created: Tue Oct  9 15:01:45 2012
+# Created: Thu Oct 11 15:13:25 2012
 #      by: PyQt4 UI code generator 4.9.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ class Ui_MainForm(object):
         MainForm.setMinimumSize(QtCore.QSize(660, 220))
         MainForm.setMaximumSize(QtCore.QSize(660, 220))
         self.layoutWidget = QtGui.QWidget(MainForm)
-        self.layoutWidget.setGeometry(QtCore.QRect(510, 20, 139, 181))
+        self.layoutWidget.setGeometry(QtCore.QRect(510, 20, 159, 181))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.layoutWidget)
         self.verticalLayout_3.setMargin(0)

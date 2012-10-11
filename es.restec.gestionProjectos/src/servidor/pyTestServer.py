@@ -46,7 +46,9 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
         SET_NEW_TASK=(
             lambda self, *args: self.server.myDataBase.set_new_task(*args)),       
         SET_NEW_ENTRY=(
-            lambda self, *args: self.server.myDataBase.set_new_entry(*args)),                                
+            lambda self, *args: self.server.myDataBase.set_new_entry(*args)),  
+        GET_TASK_ENTRIES_TIMETOTAL=(
+            lambda self, *args: self.server.myDataBase.get_task_entries_timeTotal(*args)),
         SHUTDOWN_SERVER=lambda self, *args: self.shutdown(*args)
         )
     

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 09/10/2012
 
@@ -8,6 +9,7 @@ import struct
 import pickle
 import socket
 import time
+import datetime
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -15,6 +17,7 @@ import ui_mainform
 
 MAC = "qt_mac_set_native_menubar" in dir()
 
+TIMEINTERVAL = 3000
 
 class SocketManager:
     def __init__(self, address):
@@ -47,23 +50,84 @@ class MainForm(QDialog,
         self.__IdTask = myTask
         self.__IdActivity=myActivity
         self.__Address = myAddress
+        self.__timeFromGo = 0
+        self.__timeFromLast = 0
+        self.__running = False
     
         self.setupUi(self)
         
         self.goButton.clicked.connect(self.goUpdating)
         self.stopButton.clicked.connect(self.stopUpdating)
         self.exitButton.clicked.connect(self.exitApp)
+        self.stopButton.setEnabled(False)
+        
+        self.showTimeFromGo.setText(self.getHHMM(0))
+        self.showTimeFromStart.setText(self.getHHMM(0))
+        
         #=======================================================================
         # self.connect(self.goButton, SIGNAL("Clicked()"), self.goUpdating)
         # self.connect(self.stopButton, SIGNAL("Clicked()"), self.stopUpdating)
         #=======================================================================
         self.updateUi()
+    def getHHMM(self,timeEntry):
+        prueba1 = str(datetime.timedelta(seconds=timeEntry)).split('.')[0]
+        prueba2 = prueba1.split(':')
+        prueba3 = ':'.join(prueba2[0:3])
+        return prueba3
     
     def goUpdating(self):
-        QMessageBox.warning(self, 'He llegado a Go','-Go')
-    
+        self.__timeFromGo = time.time()
+        self.__timeFromLast= self.__timeFromGo
+        self.__running = True
+        self.goButton.setEnabled(False)
+        self.stopButton.setEnabled(True)
+        self.exitButton.setEnabled(False)
+        QTimer.singleShot(TIMEINTERVAL, self.callback_Entry)
+        
+    def callback_Entry(self):
+        if self.__running:
+            try:
+                tmpTime = time.time()
+                timeEntry1 = tmpTime - self.__timeFromLast
+                timeEntry2 = tmpTime-self.__timeFromGo
+                self.__timeFromLast = tmpTime
+                totalTime = self.send_entry(timeEntry1)
+                print "TOTAL TIME = ", totalTime
+                self.showTimeFromGo.setText(self.getHHMM(timeEntry2))
+                self.showTimeFromStart.setText(self.getHHMM(totalTime))
+                print "Desde Go = %{0}\t Duración de esta carga = {1}".format(timeEntry2, timeEntry1)
+                #QMessageBox.warning(self,"","go")
+            finally:
+                QTimer.singleShot(TIMEINTERVAL, self.callback_Entry)
+                
+    def send_entry(self, timeEntry):
+        myRes = self.__IdResource
+        myProj = self.__IdProject
+        myAct = self.__IdActivity
+        myTask= self.__IdTask
+        ok, data = self.handle_request("SET_NEW_ENTRY",myRes,myProj,myAct,timeEntry,myTask)
+        if not ok:
+            QMessageBox.critical(self,"Error","Error sending new Entry")
+            self.close()
+        ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct,myTask)
+        print data[0]
+        return data[0]
+        
     def stopUpdating(self):
-        QMessageBox.warning(self, 'He llegado a Stop','-Go')
+        self.__running = False
+        tmpTime = time.time()
+        timeEntry1 = tmpTime - self.__timeFromLast
+        timeEntry2 = tmpTime-self.__timeFromGo
+        totalTime = self.send_entry(timeEntry1)
+        self.showTimeFromGo.setText(self.getHHMM(timeEntry2))
+        self.showTimeFromStart.setText(self.getHHMM(totalTime))
+        self.__timeFromGo = 0
+        self.__timeFromLast = 0
+        print "Desde Go = %{0}\t Duración de la última carga = {1}".format(timeEntry2, timeEntry1)
+        self.goButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.exitButton.setEnabled(True)
+        #QMessageBox.warning(self, 'He llegado a Stop','-Go')
     
     def exitApp(self):
         self.close()
@@ -96,68 +160,74 @@ class MainForm(QDialog,
             sys.exit(1)
 
     def updateUi(self):
-        cual = self.__IdProject
-        ok, data = self.handle_request("GET_PROJECT_BYID", cual)
+        myRes = self.__IdResource
+        myProj = self.__IdProject
+        myAct = self.__IdActivity
+        myTask= self.__IdTask
+        ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct,myTask)
+        self.showTimeFromStart.setText(self.getHHMM(data[0]))
+        
+        
+        ok, data = self.handle_request("GET_PROJECT_BYID", myProj)
         if ok:
-            if cual != str(data[0]):
-                msgProject = "Salir del programa INMEDIATAMENTE, IdProjecto = {0}, Valor devuelto = {1}".format(cual, str(data[0]))
+            if myProj != str(data[0]):
+                msgProject = "Salir del programa INMEDIATAMENTE, IdProjecto = {0}, Valor devuelto = {1}".format(myProj, str(data[0]))
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar el proyecto inicial"
             msgProject = unicode("{0}: {1}".format(data[1], data[2]))
             self.displayProyecto.setText(msgProject)
         else:
-            msgProject = "No existe el Proyecto = {0}".format(cual)
+            msgProject = "No existe el Proyecto = {0}".format(myProj)
             reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
                                              msgProject)
-            
-        cual = self.__IdResource
-        ok, data = self.handle_request("GET_RESOURCE_BYID", cual)
+        ok, data = self.handle_request("GET_RESOURCE_BYID", myRes)
         if ok:
-            if cual != str(data[0]):
-                msgProject = "Salir del programa INMEDIATAMENTE, IdResource = {0}, Valor devuelto = {1}".format(cual, str(data[0]))
+            if myRes != str(data[0]):
+                msgProject = "Salir del programa INMEDIATAMENTE, IdResource = {0}, Valor devuelto = {1}".format(myRes, str(data[0]))
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar el recurso inicial"
             msgProject = unicode("{0}".format(data[1]))
             self.displayRecurso.setText(msgProject)
         else:
-            msgProject = "No existe el Recurso = {0}".format(cual)
+            msgProject = "No existe el Recurso = {0}".format(myRes)
             reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
                                              msgProject)
             
-        cual = self.__IdActivity
-        ok, data = self.handle_request("GET_ACTIVITY_BYID", cual)
+        ok, data = self.handle_request("GET_ACTIVITY_BYID", myAct)
         if ok:
-            if cual != str(data[0]):
-                msgProject = "Salir del programa INMEDIATAMENTE, IdActivity = {0}, Valor devuelto = {1}".format(cual, str(data[0]))
+            if myAct != str(data[0]):
+                msgProject = "Salir del programa INMEDIATAMENTE, IdActivity = {0}, Valor devuelto = {1}".format(myAct, str(data[0]))
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar la actividad inicial"
             msgProject = unicode("{0}".format(data[1]))
             self.displayActividad.setText(msgProject)
         else:
-            msgProject = "No existe el Recurso = {0}".format(cual)
+            msgProject = "No existe el Recurso = {0}".format(myAct)
             reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
                                              msgProject)
                  
-        cual = self.__IdTask
-        if cual is not None:
-            ok, data = self.handle_request("GET_TASK_BYID", cual, self.__IdProject)
+        if myTask is not None:
+            ok, data = self.handle_request("GET_TASK_BYID", myTask, myProj)
             if ok:
-                if cual != str(data[0]):
-                    msgProject = "Salir del programa INMEDIATAMENTE, IdActivity = {0}, Valor devuelto = {1}".format(cual, str(data[0]))
+                if myTask != str(data[0]):
+                    msgProject = "Salir del programa INMEDIATAMENTE, IdActivity = {0}, Valor devuelto = {1}".format(myTask, str(data[0]))
                     reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                     raise ValueError, "Error al recuperar la actividad inicial"
                 msgProject = unicode("{0}".format(data[3]))
                 self.displayTarea.setText(msgProject)
             else:   
-                msgProject = "No existe el Recurso = {0}".format(cual)
+                msgProject = "No existe el Recurso = {0}".format(myTask)
                 reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
                                              msgProject)
 
     def closeEvent(self, event):
+        if self.__timeFromLast > 0:
+            timeEntry = time.time()-self.__timeFromLast
+            self.send_entry(timeEntry)
         settings = QSettings()
         settings.setValue("IdResource", (self.__IdResource))
         settings.setValue("IdProject", (self.__IdProject))
