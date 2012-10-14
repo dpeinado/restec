@@ -52,7 +52,7 @@ class projectDialog(QDialog):
         self.table.clear()
         self.table.setRowCount(len(self.myProjectList)) 
         self.table.setColumnCount(self.__numberCols) 
-        self.table.setColumnHidden(0,True)
+        #self.table.setColumnHidden(0,True)
         self.table.verticalHeader().setVisible(False)
         tmp1 = unicode("Código")
         tmp2 = unicode("Descripción")
@@ -63,11 +63,10 @@ class projectDialog(QDialog):
         self.table.setSelectionMode(QTableWidget.SingleSelection)
         selected = None
         for row, project in enumerate(self.myProjectList):
-            val = project[0]
+            val = str(project[0])
             item = QTableWidgetItem(val)
-            if current is not None and long(current) == val:
-                selected = item
-            item.setData(Qt.UserRole, QVariant(long(val)))
+            if current is not None and current == val:
+                selected = item           
             self.table.setItem(row,0,item)
             val = project[1]
             item = QTableWidgetItem(val)

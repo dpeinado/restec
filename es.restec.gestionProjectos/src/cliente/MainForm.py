@@ -101,9 +101,11 @@ class MainForm(QDialog,
                 myProjectList = list(data[1])
                 myPD = projectDialog.projectDialog(self.__IdProject, myProjectList, self)
                 if myPD.exec_():
-                    pitos = myPD.table.selectedItems()
-                    twi0 = pitos[0].data(32).toString()
-                    print "Acepté", twi0
+                    #myPD.table.setColumnHidden(0,False)
+                    itemText = myPD.table.item(myPD.table.currentRow(),1).text()
+                    itemText = myPD.table.item(myPD.table.currentRow(),2).text()
+                    itemText = myPD.table.item(myPD.table.currentRow(),0).text()
+                    pass
                 else:
                     print "Rechacé"
         pass
