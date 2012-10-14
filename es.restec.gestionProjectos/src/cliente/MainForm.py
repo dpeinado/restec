@@ -14,6 +14,7 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import ui_mainform
+import projectDialog
 
 MAC = "qt_mac_set_native_menubar" in dir()
 
@@ -38,13 +39,29 @@ class MainForm(QDialog,
         super(MainForm, self).__init__(parent)
         settings = QSettings()
         myResource = str(settings.value('IdResource').toPyObject())
+        if myResource == 'None':
+            myResource=None
         myProject = str(settings.value('IdProject').toPyObject())
+        if myProject=='None':
+            myProject=None
         myActivity = str(settings.value('IdActivity').toPyObject())
+        if myActivity =='None':
+            myActivity=None
         myTask = str(settings.value('IdTask').toPyObject())
         if myTask == 'None':
             myTask = None
-        myAddress = [str(settings.value("Host").toPyObject()), settings.value("Port").toPyObject()]
-
+        myHost = str(settings.value("Host").toPyObject())
+        if myHost == 'None':
+            myHost = 'localhost'
+        myPort = settings.value("Port").toPyObject()
+        if myPort is None:
+            myPort = 9999
+        myAddress = [myHost,myPort]
+        
+        if (myResource is None) or (myProject is None) or (myActivity is None):
+            self.__ready = False
+        else:
+            self.__ready = True
         self.__IdResource = myResource
         self.__IdProject = myProject
         self.__IdTask = myTask
@@ -59,8 +76,12 @@ class MainForm(QDialog,
         self.goButton.clicked.connect(self.goUpdating)
         self.stopButton.clicked.connect(self.stopUpdating)
         self.exitButton.clicked.connect(self.exitApp)
-        self.stopButton.setEnabled(False)
+        self.setProyectoButton.clicked.connect(self.setProject)
         
+        self.stopButton.setEnabled(False)
+        self.goButton.setEnabled(False)
+        if(self.__ready):
+            self.goButton.setEnabled(True)
         self.showTimeFromGo.setText(self.getHHMM(0))
         self.showTimeFromStart.setText(self.getHHMM(0))
         
@@ -69,6 +90,25 @@ class MainForm(QDialog,
         # self.connect(self.stopButton, SIGNAL("Clicked()"), self.stopUpdating)
         #=======================================================================
         self.updateUi()
+        
+        
+        
+    def setProject(self):
+        print "Estoy en setProject"
+        ok, data = self.handle_request("GET_PROJECT_LIST")
+        if ok:
+            if len(data)==2:
+                myProjectList = list(data[1])
+                myPD = projectDialog.projectDialog(self.__IdProject, myProjectList, self)
+                if myPD.exec_():
+                    pitos = myPD.table.selectedItems()
+                    twi0 = pitos[0].data(32).toString()
+                    print "Acepté", twi0
+                else:
+                    print "Rechacé"
+        pass
+    
+    
     def getHHMM(self,timeEntry):
         prueba1 = str(datetime.timedelta(seconds=timeEntry)).split('.')[0]
         prueba2 = prueba1.split(':')
@@ -82,6 +122,11 @@ class MainForm(QDialog,
         self.goButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.exitButton.setEnabled(False)
+        self.setProyectoButton.setEnabled(False)
+        self.setRecursoButton.setEnabled(False)
+        self.setTareaButton.setEnabled(False)
+        self.setActividadButton.setEnabled(False)
+        
         QTimer.singleShot(TIMEINTERVAL, self.callback_Entry)
         
     def callback_Entry(self):
@@ -127,6 +172,11 @@ class MainForm(QDialog,
         self.goButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.exitButton.setEnabled(True)
+        self.setProyectoButton.setEnabled(True)
+        self.setRecursoButton.setEnabled(True)
+        self.setTareaButton.setEnabled(True)
+        self.setActividadButton.setEnabled(True)
+         
         #QMessageBox.warning(self, 'He llegado a Stop','-Go')
     
     def exitApp(self):
@@ -160,12 +210,20 @@ class MainForm(QDialog,
             sys.exit(1)
 
     def updateUi(self):
+        if not self.__ready:
+            return
         myRes = self.__IdResource
         myProj = self.__IdProject
         myAct = self.__IdActivity
         myTask= self.__IdTask
+
         ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct,myTask)
-        self.showTimeFromStart.setText(self.getHHMM(data[0]))
+        if ok:
+            if data[0] is not None:
+                tmpTime = data[0]
+            else:
+                tmpTime = 0
+            self.showTimeFromStart.setText(self.getHHMM(tmpTime))
         
         
         ok, data = self.handle_request("GET_PROJECT_BYID", myProj)
@@ -225,10 +283,18 @@ class MainForm(QDialog,
                                              msgProject)
 
     def closeEvent(self, event):
-        if self.__timeFromLast > 0:
-            timeEntry = time.time()-self.__timeFromLast
-            self.send_entry(timeEntry)
+        if self.__running:
+            if self.__timeFromLast > 0:
+                timeEntry = time.time()-self.__timeFromLast
+                self.send_entry(timeEntry)
         settings = QSettings()
+       
+        #=======================================================================
+        # self.__IdResource='1'
+        # self.__IdProject='1'
+        # self.__IdActivity='1'
+        #=======================================================================
+
         settings.setValue("IdResource", (self.__IdResource))
         settings.setValue("IdProject", (self.__IdProject))
         if self.__IdTask is None:

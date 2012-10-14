@@ -11,6 +11,7 @@ import SocketServer
 import threading
 import time
 import myDb
+import sys
 
 class Finish(Exception): pass
 
@@ -77,7 +78,7 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
 class ThreadServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
 
-def main():
+if __name__ == "__main__":
     host = 'localhost'
     port = 9999
     user = 'puser'
@@ -86,15 +87,13 @@ def main():
     try:
         server = ThreadServer((host,port), MyDbServerManagerRequestHandler)
         server.myDataBase=myDb.myDb('localhost', 'puser','pu8549','projects')
-        server.myDataBase.connect()
+        if not server.myDataBase.connect():
+            sys.exit(1)
         print "Server a la escucha"
         server.serve_forever()
     except Exception as err:
         print("ERROR", err)
     finally:
         print "Estoy en Finally"
-        if server is not None:
-            server.shutdown()
-
-
-main()
+        if server.myDataBase.conn() is not None:
+            server.myDataBase.disconnect()
