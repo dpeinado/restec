@@ -73,7 +73,7 @@ end;
 |
 delimiter ;
 
-load data infile '/Users/bicho/restec/sql_creacion_db/projects.txt' into table Projects fields terminated by '\t' (Code, Description) set IdProject = NULL;
-load data infile '/Users/bicho/restec/sql_creacion_db/resources.txt' into table Resources fields terminated by '\t' (Name, Cost) set IdResource = NULL;
-load data infile '/Users/bicho/restec/sql_creacion_db/activities.txt' into table Activities fields terminated by '\t' (Activity) set IdActivity = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/projects.txt' into table Projects character set UTF8 fields terminated by '\t' (Code, Description) set IdProject = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/resources.txt' into table Resources character set UTF8 fields terminated by '\t' (Name, Cost) set IdResource = NULL;
+load data infile '/Users/bicho/restec/sql_creacion_db/activities.txt' into table Activities character set UTF8 fields terminated by '\t' (Activity) set IdActivity = NULL;
 
