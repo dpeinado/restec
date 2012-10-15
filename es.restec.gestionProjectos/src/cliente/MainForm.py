@@ -15,6 +15,9 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import ui_mainform
 import projectDialog
+import resourceDialog
+import activityDialog
+
 
 MAC = "qt_mac_set_native_menubar" in dir()
 
@@ -77,7 +80,9 @@ class MainForm(QDialog,
         self.stopButton.clicked.connect(self.stopUpdating)
         self.exitButton.clicked.connect(self.exitApp)
         self.setProyectoButton.clicked.connect(self.setProject)
-        
+        self.setRecursoButton.clicked.connect(self.setResource)
+        self.setActividadButton.clicked.connect(self.setActivity)
+
         self.stopButton.setEnabled(False)
         self.goButton.setEnabled(False)
         if(self.__ready):
@@ -110,6 +115,38 @@ class MainForm(QDialog,
                     print "Rechacé"
         pass
     
+    def setResource(self):
+        print "Estoy en setResource"
+        ok, data = self.handle_request("GET_RESOURCE_LIST")
+        if ok:
+            if len(data)==2:
+                myResourceList = list(data[1])
+                myRD = resourceDialog.resourceDialog(self.__IdResource, myResourceList, self)
+                if myRD.exec_():
+                    self.__IdResource = myRD.table.item(myRD.table.currentRow(),0).text()
+                    itemText1 = myRD.table.item(myRD.table.currentRow(),1).text()
+                    msgProject = unicode("{0}".format(itemText1))
+                    self.displayRecurso.setText(msgProject)
+                else:
+                    print "Rechacé"
+        pass    
+
+    def setActivity(self):
+        print "Estoy en setActivity"
+        ok, data = self.handle_request("GET_ACTIVITY_LIST")
+        if ok:
+            if len(data)==2:
+                myActivityList = list(data[1])
+                myAD = activityDialog.activityDialog(self.__IdActivity, myActivityList, self)
+                if myAD.exec_():
+                    self.__IdActivity = myAD.table.item(myAD.table.currentRow(),0).text()
+                    itemText1 = myAD.table.item(myAD.table.currentRow(),1).text()
+                    msgProject = unicode("{0}".format(itemText1))
+                    self.displayActividad.setText(msgProject)
+                else:
+                    print "Rechacé"
+        pass    
+
     
     def getHHMM(self,timeEntry):
         prueba1 = str(datetime.timedelta(seconds=timeEntry)).split('.')[0]

@@ -76,7 +76,7 @@ if __name__ == "__main__":
     form = newProjectDlg(projects)
     form.show()
     if form.exec_():
-        print "Acepté"
+        print "Acept≈Ω"
     else:
-        print "Cancelé"
+        print "Cancel≈Ω"
         

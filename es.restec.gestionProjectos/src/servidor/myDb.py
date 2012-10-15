@@ -304,7 +304,9 @@ class myDb(object):
             # Parece que no existe un recurso igual ... luego inserto
             cur.execute ("INSERT INTO Resources(Name, Cost) VALUES(%s,%s)",(Name,Cost))
             self.__conn.commit()
-            return (True, ("Insertado nuevo recurso",))
+            cur.execute("select * from resources where Name like %s",(Name,))
+            row=cur.fetchone()
+            return (True, row)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             self.__conn.rollback()
@@ -320,10 +322,12 @@ class myDb(object):
             cur.execute("SELECT * from Activities WHERE Activity LIKE %s", (Activity,))
             if cur.rowcount > 0:
                 return (False, ("Fase existente con este mismo Nombre",))
-            # Parece que no existe una fase igual ... luego inserto            
-            cur.execute ("INSERT INTO Fases(Fase) VALUES(%s)",(Activity,))
+            # Parece que no existe una actividad igual ... luego inserto            
+            cur.execute ("INSERT INTO Activities(Activity) VALUES(%s)",(Activity,))
             self.__conn.commit()
-            return (True, ("Insertado nueva fase",))
+            cur.execute("select * from Activities where Activity like %s",(Activity,))
+            row=cur.fetchone()
+            return (True, row)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             self.__conn.rollback()
@@ -348,7 +352,9 @@ class myDb(object):
                     return (False, ("Error IdTaskParent Inexistente",))
             cur.execute ("INSERT INTO Tasks(IdProjectParent,IdTaskParent,Task) VALUES(%s,%s,%s)",(IdProjectParent,IdTaskParent,Task))
             self.__conn.commit()
-            return (True, ("Insertado nueva fase",))
+            cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent = %s and Task like %s",(IdProjectParent,IdTaskParent,Task))
+            row=cur.fetchone()
+            return (True, row)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             self.__conn.rollback()
@@ -367,7 +373,9 @@ class myDb(object):
                 cur.execute ("""INSERT INTO Entries(IdResource,IdProject,IdActivity,Tsec) 
                     VALUES(%s,%s,%s,%s)""",(IdResource,IdProject,IdActivity,Tsec))          
             self.__conn.commit()
-            return (True, ("Insertado nueva Entrada",))
+            cur.execute("select * from entries where Idresource = %s and Idproject = %s and Idactivity = %s and Tsec = %s",(IdResource,IdProject,IdActivity,Tsec))
+            row=cur.fetchone()
+            return (True, row)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             self.__conn.rollback()
