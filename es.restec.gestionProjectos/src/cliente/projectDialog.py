@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 '''
 Created on 14/10/2012
@@ -8,7 +7,7 @@ Created on 14/10/2012
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
+import newProject
 
 class projectDialog(QDialog):
     '''
@@ -16,7 +15,8 @@ class projectDialog(QDialog):
     '''
     def __init__(self, current, myProjectList,parent=None):
         super(projectDialog,self).__init__(parent)
-        self.setMinimumSize(400,200)
+        self.myParent = parent
+        self.setMinimumSize(500,200)
         self.myProjectList = myProjectList
         self.__current = current
         self.__numberRows = len(myProjectList)
@@ -31,7 +31,7 @@ class projectDialog(QDialog):
         hbox = QHBoxLayout()
         hbox.addWidget(okButton)
         hbox.addWidget(cancelButton)
-        #hbox.addStretch()
+        hbox.addStretch()
         hbox.addWidget(newButton)
         layout=QVBoxLayout()
         layout.addWidget(tableLabel)
@@ -46,13 +46,22 @@ class projectDialog(QDialog):
         self.updateTable(self.__current)
         
     def makeNewProject(self):
-        pass
+        myNPD = newProject.newProjectDlg( self.myProjectList, self)
+        if myNPD.exec_():
+            ncode = myNPD.myCode.text()
+            ndesc = myNPD.myDesc.text()
+            ok, data = self.myParent.handle_request("SET_NEW_PROJECT",ncode,ndesc)
+            if ok:
+                self.myProjectList.append(data)
+                self.updateTable(str(data[0]))
+        else:
+            print "Rechacé"
         
     def updateTable(self,current=None):
         self.table.clear()
         self.table.setRowCount(len(self.myProjectList)) 
         self.table.setColumnCount(self.__numberCols) 
-        #self.table.setColumnHidden(0,True)
+        self.table.setColumnHidden(0,True)
         self.table.verticalHeader().setVisible(False)
         tmp1 = unicode("Código")
         tmp2 = unicode("Descripción")
@@ -75,11 +84,12 @@ class projectDialog(QDialog):
             item = QTableWidgetItem(val)
             self.table.setItem(row,2,item)            
         self.table.resizeColumnsToContents()
+        self.table.sortItems(1,Qt.AscendingOrder)
+        #self.table.repaint()
         if selected is not None:
             selected.setSelected(True)
             self.table.setCurrentItem(selected)
             self.table.scrollToItem(selected)    
-        pass
         #=======================================================================
         # self.table.clear()
         # self.table.setRowCount(len(self.movies))

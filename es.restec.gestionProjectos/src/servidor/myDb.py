@@ -54,7 +54,7 @@ class myDb(object):
     def get_project_list(self):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Projects")
+            cur.execute("SELECT * from Projects order by Code")
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
@@ -70,8 +70,11 @@ class myDb(object):
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Projects WHERE IdProject = %s", (IdProject,))
-            row = cur.fetchone()
-            return (True,row)
+            if cur.rowcount == 1:
+                row = cur.fetchone()
+                return (True,row)
+            else:
+                return(False,())
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             return (False, ("Error en get_project_byId", IdProject))
@@ -98,8 +101,11 @@ class myDb(object):
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Resources WHERE IdResource = %s", (IdResource,))
-            row = cur.fetchone()
-            return (True,row)
+            if cur.rowcount == 1:
+                row = cur.fetchone()
+                return (True,row)
+            else:
+                return(False,())
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             return (False, ("Error en get_resource_byId", IdResource))
@@ -126,8 +132,11 @@ class myDb(object):
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Activities WHERE IdActivity = %s", (IdResource,))
-            row = cur.fetchone()
-            return (True,row)
+            if cur.rowcount == 1:
+                row = cur.fetchone()
+                return (True,row)
+            else:
+                return(False,())
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             return (False, ("Error en get_activity_byId", IdResource))
@@ -154,8 +163,11 @@ class myDb(object):
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Tasks WHERE IdTask = %s and IdProjectParent = %s", (IdTask,IdProject))
-            row = cur.fetchone()
-            return (True,row)
+            if cur.rowcount == 1:
+                row = cur.fetchone()
+                return (True,row)
+            else:
+                return(False,())
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             return (False, ("Error en get_task_byId", IdTask))
@@ -273,7 +285,9 @@ class myDb(object):
             # Parece que no existe un proyecto igual ... luego inserto
             cur.execute ("INSERT INTO Projects(Code,Description) VALUES(%s,%s)",(Code,Description))
             self.__conn.commit()
-            return (True, ("Insertado nuevo proyecto",))
+            cur.execute("select * from Projects where Code = %s",(Code,))
+            row = cur.fetchone()
+            return (True, row)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             self.__conn.rollback()

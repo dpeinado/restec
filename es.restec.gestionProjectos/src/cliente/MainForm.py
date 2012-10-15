@@ -101,11 +101,11 @@ class MainForm(QDialog,
                 myProjectList = list(data[1])
                 myPD = projectDialog.projectDialog(self.__IdProject, myProjectList, self)
                 if myPD.exec_():
-                    #myPD.table.setColumnHidden(0,False)
-                    itemText = myPD.table.item(myPD.table.currentRow(),1).text()
-                    itemText = myPD.table.item(myPD.table.currentRow(),2).text()
-                    itemText = myPD.table.item(myPD.table.currentRow(),0).text()
-                    pass
+                    self.__IdProject = myPD.table.item(myPD.table.currentRow(),0).text()
+                    itemText1 = myPD.table.item(myPD.table.currentRow(),1).text()
+                    itemText2 = myPD.table.item(myPD.table.currentRow(),2).text()
+                    msgProject = unicode("{0}: {1}".format(itemText1, itemText2))
+                    self.displayProyecto.setText(msgProject)
                 else:
                     print "Rechacé"
         pass
@@ -238,9 +238,10 @@ class MainForm(QDialog,
             msgProject = unicode("{0}: {1}".format(data[1], data[2]))
             self.displayProyecto.setText(msgProject)
         else:
-            msgProject = "No existe el Proyecto = {0}".format(myProj)
-            reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
-                                             msgProject)
+            msgProject = "ERROR en el almacenamiento de los datos iniciales No existe el proyecto = {0}".format(myProj)
+            reply = QMessageBox.warning(self, 'ERROR', msgProject)
+            self.__IdProject=None
+            
         ok, data = self.handle_request("GET_RESOURCE_BYID", myRes)
         if ok:
             if myRes != str(data[0]):
@@ -251,9 +252,9 @@ class MainForm(QDialog,
             msgProject = unicode("{0}".format(data[1]))
             self.displayRecurso.setText(msgProject)
         else:
-            msgProject = "No existe el Recurso = {0}".format(myRes)
-            reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
-                                             msgProject)
+            msgProject = "ERROR en el almacenamiento de los datos iniciales No existe el recurso = {0}".format(myRes)
+            reply = QMessageBox.warning(self, 'ERROR',msgProject)
+            self.__IdResource=None
             
         ok, data = self.handle_request("GET_ACTIVITY_BYID", myAct)
         if ok:
@@ -265,9 +266,9 @@ class MainForm(QDialog,
             msgProject = unicode("{0}".format(data[1]))
             self.displayActividad.setText(msgProject)
         else:
-            msgProject = "No existe el Recurso = {0}".format(myAct)
-            reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
-                                             msgProject)
+            msgProject = "ERROR en el almacenamiento de los datos iniciales No existe la Actividad = {0}".format(myAct)
+            reply = QMessageBox.warning(self, 'ERROR',msgProject)
+            self.__IdActivity=None
                  
         if myTask is not None:
             ok, data = self.handle_request("GET_TASK_BYID", myTask, myProj)
@@ -280,9 +281,9 @@ class MainForm(QDialog,
                 msgProject = unicode("{0}".format(data[3]))
                 self.displayTarea.setText(msgProject)
             else:   
-                msgProject = "No existe el Recurso = {0}".format(myTask)
-                reply = QMessageBox.warning(self, 'ERROR en el almacenamiento de los datos iniciales',
-                                             msgProject)
+                msgProject = "ERROR en el almacenamiento de los datos iniciales No existe la Tarea = {0}".format(myTask)
+                reply = QMessageBox.warning(self, 'ERROR', msgProject)
+                self.__IdTask=None
 
     def closeEvent(self, event):
         if self.__running:

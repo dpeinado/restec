@@ -1,3 +1,4 @@
+set character_set_database=UTF8;
 drop database if exists projects;
 create database projects character set 'UTF8';
 grant all on projects.* to 'puser'@'localhost' identified by 'pu8549';
@@ -6,13 +7,13 @@ use projects;
 CREATE TABLE IF NOT EXISTS Projects(
 	IdProject INT AUTO_INCREMENT, 
     Code CHAR(3) not null, 
-    Description varchar(45) not null,
+    Description varchar(80) not null,
     PRIMARY KEY(IdProject)
 ) ENGINE=INNODB character set utf8;
 
 CREATE TABLE IF NOT EXISTS Resources(
 	IdResource INT AUTO_INCREMENT, 
-    Name VARCHAR(45) not null, 
+    Name VARCHAR(50) not null, 
     Cost real,
     PRIMARY KEY(IdResource)
 ) ENGINE=INNODB character set utf8;
