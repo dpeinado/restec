@@ -18,8 +18,8 @@ class newProjectDlg(QDialog):
         self.setMinimumSize(300,200)
         self.myProjectList = myProjectList
         self.msgLabel = QLabel("Ok")
-        codeLabel = QLabel("Codigo")
-        descLabel = QLabel(QString("Descripcion"))
+        codeLabel = QLabel(u"Código")
+        descLabel = QLabel(QString(u"Descripción"))
         self.myCode = QLineEdit("")
         self.myDesc = QLineEdit("")
         codeLabel.setBuddy(self.myCode)

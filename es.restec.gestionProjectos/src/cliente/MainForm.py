@@ -19,8 +19,6 @@ import resourceDialog
 import activityDialog
 
 
-MAC = "qt_mac_set_native_menubar" in dir()
-
 TIMEINTERVAL = 3000
 
 class SocketManager:
@@ -95,8 +93,6 @@ class MainForm(QDialog,
         # self.connect(self.stopButton, SIGNAL("Clicked()"), self.stopUpdating)
         #=======================================================================
         self.updateUi()
-        
-        
         
     def setProject(self):
         print "Estoy en setProject"

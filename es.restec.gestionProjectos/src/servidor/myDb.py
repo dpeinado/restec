@@ -279,11 +279,11 @@ class myDb(object):
             cur.execute("SELECT * from Projects WHERE Code = %s", (Code,))
             if cur.rowcount > 0:
                 return (False, ("Proyecto existente con este mismo código",))
-            cur.execute("SELECT * from Projects WHERE Description LIKE %s", (Description,))
+            cur.execute("SELECT * from Projects WHERE Description LIKE %s", (unicode(Description),))
             if cur.rowcount > 0:
                 return (False, ("Proyecto existente con esta misma descripción",))
             # Parece que no existe un proyecto igual ... luego inserto
-            cur.execute ("INSERT INTO Projects(Code,Description) VALUES(%s,%s)",(Code,Description))
+            cur.execute ("INSERT INTO Projects(Code,Description) VALUES(%s,%s)",(Code,unicode(Description)))
             self.__conn.commit()
             cur.execute("select * from Projects where Code = %s",(Code,))
             row = cur.fetchone()
@@ -297,14 +297,16 @@ class myDb(object):
                 cur.close()
     def set_new_resource(self, Name, Cost):
         try:
+            if Cost is None:
+                Cost = 0.0;
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Resources WHERE Name LIKE %s", (Name,))
+            cur.execute("SELECT * from Resources WHERE Name LIKE %s", (unicode(Name,)))
             if cur.rowcount > 0:
                 return (False, ("Recurso existente con este mismo Nombre",))
             # Parece que no existe un recurso igual ... luego inserto
-            cur.execute ("INSERT INTO Resources(Name, Cost) VALUES(%s,%s)",(Name,Cost))
+            cur.execute ("INSERT INTO Resources(Name, Cost) VALUES(%s,%s)",(unicode(Name),Cost))
             self.__conn.commit()
-            cur.execute("select * from resources where Name like %s",(Name,))
+            cur.execute("select * from resources where Name like %s",(unicode(Name,)))
             row=cur.fetchone()
             return (True, row)
         except MySQLdb.Error, e:
@@ -319,13 +321,13 @@ class myDb(object):
     def set_new_activity(self, Activity):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Activities WHERE Activity LIKE %s", (Activity,))
+            cur.execute("SELECT * from Activities WHERE Activity LIKE %s", (unicode(Activity,)))
             if cur.rowcount > 0:
                 return (False, ("Fase existente con este mismo Nombre",))
             # Parece que no existe una actividad igual ... luego inserto            
-            cur.execute ("INSERT INTO Activities(Activity) VALUES(%s)",(Activity,))
+            cur.execute ("INSERT INTO Activities(Activity) VALUES(%s)",(unicode(Activity,)))
             self.__conn.commit()
-            cur.execute("select * from Activities where Activity like %s",(Activity,))
+            cur.execute("select * from Activities where Activity like %s",(unicode(Activity,)))
             row=cur.fetchone()
             return (True, row)
         except MySQLdb.Error, e:
@@ -350,9 +352,9 @@ class myDb(object):
                 cur.execute("SELECT * from Tasks where IdTask = %s",(IdTaskParent,))
                 if cur.rowcount == 0:
                     return (False, ("Error IdTaskParent Inexistente",))
-            cur.execute ("INSERT INTO Tasks(IdProjectParent,IdTaskParent,Task) VALUES(%s,%s,%s)",(IdProjectParent,IdTaskParent,Task))
+            cur.execute ("INSERT INTO Tasks(IdProjectParent,IdTaskParent,Task) VALUES(%s,%s,%s)",(IdProjectParent,IdTaskParent,unicode(Task)))
             self.__conn.commit()
-            cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent = %s and Task like %s",(IdProjectParent,IdTaskParent,Task))
+            cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent = %s and Task like %s",(IdProjectParent,IdTaskParent,unicode(Task)))
             row=cur.fetchone()
             return (True, row)
         except MySQLdb.Error, e:

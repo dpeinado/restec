@@ -21,13 +21,13 @@ class taskDialog(QDialog):
         self.__current = current
         self.__numberRows = len(myTaskList)
         self.__numberCols = 3
-        tableLabel = QLabel("Proyectos")
-        self.table = QTableWidget()
+        tableLabel = QLabel("Tareas")
+        self.table = QTreeWidget()
         #self.myTable=QLineEdit()
         tableLabel.setBuddy(self.table)
         okButton = QPushButton("&Ok")
         cancelButton = QPushButton("Cancel")
-        newButton = QPushButton("Proyecto &Nuevo")
+        newButton = QPushButton("Tarea &Nueva")
         hbox = QHBoxLayout()
         hbox.addWidget(okButton)
         hbox.addWidget(cancelButton)
@@ -55,7 +55,7 @@ class taskDialog(QDialog):
                 self.myTaskList.append(data)
                 self.updateTable(str(data[0]))
         else:
-            print "RechacŽ"
+            print "Rechacï¿½"
         
     def updateTable(self,current=None):
         self.table.clear()
@@ -63,8 +63,8 @@ class taskDialog(QDialog):
         self.table.setColumnCount(self.__numberCols) 
         self.table.setColumnHidden(0,True)
         self.table.verticalHeader().setVisible(False)
-        tmp1 = QString("C—digo")
-        tmp2 = QString("Descripci—n")
+        tmp1 = QString("Cï¿½digo")
+        tmp2 = QString("Descripciï¿½n")
         self.table.setHorizontalHeaderLabels([QString("Id"), tmp1,  tmp2])
         self.table.setAlternatingRowColors(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -104,6 +104,6 @@ if __name__ == "__main__":
     form = taskDialog(current,tasks)
     form.show()
     if form.exec_():
-        print "AceptŽ"
+        print "Aceptï¿½"
     else:
-        print "CancelŽ"
+        print "Cancelï¿½"
