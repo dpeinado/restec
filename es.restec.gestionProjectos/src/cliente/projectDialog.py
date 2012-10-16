@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 '''
 Created on 14/10/2012
 
@@ -63,9 +63,9 @@ class projectDialog(QDialog):
         self.table.setColumnCount(self.__numberCols) 
         self.table.setColumnHidden(0,True)
         self.table.verticalHeader().setVisible(False)
-        tmp1 = unicode("Código")
-        tmp2 = unicode("Descripción")
-        self.table.setHorizontalHeaderLabels([QString("Id"), QString(tmp1),  QString(tmp2)])
+        tmp1 = QString("Código")
+        tmp2 = QString("Descripción")
+        self.table.setHorizontalHeaderLabels([QString("Id"), tmp1,  tmp2])
         self.table.setAlternatingRowColors(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)

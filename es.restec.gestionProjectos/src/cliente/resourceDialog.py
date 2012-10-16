@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 '''
 Created on 14/10/2012
 
@@ -64,9 +64,9 @@ class resourceDialog(QDialog):
         self.table.setColumnHidden(0,True)
         self.table.setColumnHidden(2,True)
         self.table.verticalHeader().setVisible(False)
-        tmp1 = unicode("Nombre")
-        tmp2 = unicode("Coste")
-        self.table.setHorizontalHeaderLabels([QString("Id"), QString(tmp1),  QString(tmp2)])
+        tmp1 = QString("Nombre")
+        tmp2 = QString("Coste")
+        self.table.setHorizontalHeaderLabels([QString("Id"), tmp1,  tmp2])
         self.table.setAlternatingRowColors(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -105,6 +105,6 @@ if __name__ == "__main__":
     form = resourceDialog(current,Resources)
     form.show()
     if form.exec_():
-        print "AceptŽ"
+        print "Aceptï¿½"
     else:
-        print "CancelŽ"
+        print "Cancelï¿½"

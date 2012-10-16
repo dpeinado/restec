@@ -5,7 +5,7 @@
 	<key>549DAB43-E7DB-429D-83E8-B58CD7A3B0EA</key>
 	<dict>
 		<key>Visible Rect</key>
-		<string>{{0, 354}, {949, 667}}</string>
+		<string>{{0, 0}, {735, 667}}</string>
 		<key>Zoom Factor</key>
 		<real>1</real>
 	</dict>
@@ -13,16 +13,23 @@
 	<array/>
 	<key>Expanded Sections</key>
 	<array/>
+	<key>F28E3005-5B2C-47BE-8689-DD8673BB2057</key>
+	<dict>
+		<key>Visible Rect</key>
+		<string>{{7, 0}, {817, 667}}</string>
+		<key>Zoom Factor</key>
+		<real>1</real>
+	</dict>
 	<key>InspectorBar RBSplitView Layout</key>
 	<string>2 27 682</string>
 	<key>Last Viewed Ideaspaces</key>
 	<array>
-		<string>549DAB43-E7DB-429D-83E8-B58CD7A3B0EA</string>
+		<string>F28E3005-5B2C-47BE-8689-DD8673BB2057</string>
 	</array>
 	<key>Last Viewed Section</key>
 	<array/>
 	<key>Library RBSplitView Layout</key>
-	<string>2 682 302.182H</string>
+	<string>2 682 -302.182H</string>
 	<key>LibraryPanel.Settings</key>
 	<dict>
 		<key>LibraryPanel.HiddenColumns</key>
@@ -30,7 +37,7 @@
 		<key>LibraryPanel.SelectedFilter</key>
 		<integer>0</integer>
 		<key>LibraryPanel.SortDescending</key>
-		<false/>
+		<true/>
 		<key>LibraryPanel.SortKey</key>
 		<string>CCAsset Title</string>
 		<key>LibraryPanel.TableSettings</key>
@@ -67,7 +74,7 @@
 			</array>
 			<key>CCAsset Kind</key>
 			<array>
-				<real>347</real>
+				<real>28</real>
 				<integer>8</integer>
 			</array>
 			<key>CCAsset Last Modified Date</key>
@@ -83,12 +90,12 @@
 		</dict>
 	</dict>
 	<key>Main RBSplitView Layout</key>
-	<string>3 135.058H 964 280</string>
+	<string>3 131 832 280</string>
 	<key>Normal Window Layout</key>
 	<string>{{0, 0}, {1245, 778}}</string>
 	<key>Organizer RBSplitView Layout</key>
-	<string>2 102H 406</string>
+	<string>2 102H 405</string>
 	<key>Projects RBSplitView Layout</key>
-	<string>2 429.166 250.834</string>
+	<string>2 427.833 252.167</string>
 </dict>
 </plist>

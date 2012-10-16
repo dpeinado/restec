@@ -9,14 +9,14 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class newProjectDlg(QDialog):
+class newTaskDlg(QDialog):
     '''
     classdocs
     '''
-    def __init__(self, myProjectList,parent=None):
-        super(newProjectDlg,self).__init__(parent)
+    def __init__(self, myTaskList,parent=None):
+        super(newTaskDlg,self).__init__(parent)
         self.setMinimumSize(300,200)
-        self.myProjectList = myProjectList
+        self.myTaskList = myTaskList
         self.msgLabel = QLabel("Ok")
         codeLabel = QLabel("Codigo")
         descLabel = QLabel(QString("Descripcion"))
@@ -57,12 +57,12 @@ class newProjectDlg(QDialog):
     def validateCode(self):
         newCode = self.myCode.text()
         codes = []
-        for projs in self.myProjectList:
+        for projs in self.myTaskList:
             codes.append(projs[1])
         if newCode in codes:
             self.myCode.selectAll()
             self.myCode.setFocus()
-            self.msgLabel.setText("Existe un projecto con ese Codigo")
+            self.msgLabel.setText("Existe un tasko con ese Codigo")
         else:
             self.msgLabel.setText("Codigo correcto")
         pass
@@ -71,9 +71,9 @@ class newProjectDlg(QDialog):
     
 if __name__ == "__main__":
     app=QApplication(sys.argv)
-    projects = []
+    tasks = []
     current = 1
-    form = newProjectDlg(projects)
+    form = newTaskDlg(tasks)
     form.show()
     if form.exec_():
         print "AceptŽ"

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 '''
 Created on 09/10/2012
 
@@ -109,8 +109,19 @@ class MainForm(QDialog,
                     self.__IdProject = myPD.table.item(myPD.table.currentRow(),0).text()
                     itemText1 = myPD.table.item(myPD.table.currentRow(),1).text()
                     itemText2 = myPD.table.item(myPD.table.currentRow(),2).text()
-                    msgProject = unicode("{0}: {1}".format(itemText1, itemText2))
+                    msgProject = QString("%1: %2").arg(itemText1).arg(itemText2)
+                    #msgProject = "{0}: {1}".format(itemText1, itemText2)
                     self.displayProyecto.setText(msgProject)
+                    if (self.__IdResource is None) or (self.__IdProject is None) \
+                        or (self.__IdActivity is None):
+                        self.__ready = False
+                    else:
+                        self.__ready = True
+                if self.__ready:
+                    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
+                                                   self.__IdResource,self.__IdProject,
+                                                   self.__IdActivity, self.__IdTask)
+                    self.showTimeFromStart.setText(self.getHHMM(data[0]))
                 else:
                     print "Rechacé"
         pass
@@ -125,8 +136,19 @@ class MainForm(QDialog,
                 if myRD.exec_():
                     self.__IdResource = myRD.table.item(myRD.table.currentRow(),0).text()
                     itemText1 = myRD.table.item(myRD.table.currentRow(),1).text()
-                    msgProject = unicode("{0}".format(itemText1))
+                    msgProject = QString("%1").arg(itemText1)
+                    #msgProject = "{0}".format(itemText1)
                     self.displayRecurso.setText(msgProject)
+                    if (self.__IdResource is None) or (self.__IdProject is None) \
+                        or (self.__IdActivity is None):
+                        self.__ready = False
+                    else:
+                        self.__ready = True
+                if self.__ready:
+                    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
+                                                   self.__IdResource,self.__IdProject,
+                                                   self.__IdActivity, self.__IdTask)
+                    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
                 else:
                     print "Rechacé"
         pass    
@@ -141,14 +163,54 @@ class MainForm(QDialog,
                 if myAD.exec_():
                     self.__IdActivity = myAD.table.item(myAD.table.currentRow(),0).text()
                     itemText1 = myAD.table.item(myAD.table.currentRow(),1).text()
-                    msgProject = unicode("{0}".format(itemText1))
+                    msgProject = QString("%1").arg(itemText1)
                     self.displayActividad.setText(msgProject)
+                    if (self.__IdResource is None) or (self.__IdProject is None) \
+                        or (self.__IdActivity is None):
+                        self.__ready = False
+                    else:
+                        self.__ready = True
+                if self.__ready:
+                    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
+                                                   self.__IdResource,self.__IdProject,
+                                                   self.__IdActivity, self.__IdTask)
+                    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
                 else:
                     print "Rechacé"
         pass    
 
+    def setTask(self):
+        print "Estoy en setTask"
+        ok, data = self.handle_request("GET_TASK_LIST", self.__IdProject)
+        if ok:
+            if len(data)==2:
+                myTaskList = list(data[1])
+                pass
+                #===============================================================
+                # myTD = taskDialog.taskDialog(self.__IdTask, myTaskList, self)
+                # if myTD.exec_():
+                #    self.__IdTask = myTD.table.item(myTD.table.currentRow(),0).text()
+                #    itemText1 = myAD.table.item(myAD.table.currentRow(),1).text()
+                #    msgProject = QString("%1").arg(itemText1)
+                #    self.displayActividad.setText(msgProject)
+                #    if (self.__IdResource is None) or (self.__IdProject is None) \
+                #        or (self.__IdActivity is None):
+                #        self.__ready = False
+                #    else:
+                #        self.__ready = True
+                # if self.__ready:
+                #    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
+                #                                   self.__IdResource,self.__IdProject,
+                #                                   self.__IdActivity, self.__IdTask)
+                #    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
+                # else:
+                #    print "Rechacé"
+                #===============================================================
+        pass  
     
     def getHHMM(self,timeEntry):
+        if timeEntry is None:
+            return '00:00'
         prueba1 = str(datetime.timedelta(seconds=timeEntry)).split('.')[0]
         prueba2 = prueba1.split(':')
         prueba3 = ':'.join(prueba2[0:3])
@@ -272,7 +334,7 @@ class MainForm(QDialog,
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar el proyecto inicial"
-            msgProject = unicode("{0}: {1}".format(data[1], data[2]))
+            msgProject = QString("%1: %2").arg(data[1]).arg(data[2])
             self.displayProyecto.setText(msgProject)
         else:
             msgProject = "ERROR en el almacenamiento de los datos iniciales No existe el proyecto = {0}".format(myProj)
@@ -286,7 +348,7 @@ class MainForm(QDialog,
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar el recurso inicial"
-            msgProject = unicode("{0}".format(data[1]))
+            msgProject = QString(data[1])
             self.displayRecurso.setText(msgProject)
         else:
             msgProject = "ERROR en el almacenamiento de los datos iniciales No existe el recurso = {0}".format(myRes)
@@ -300,7 +362,7 @@ class MainForm(QDialog,
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar la actividad inicial"
-            msgProject = unicode("{0}".format(data[1]))
+            msgProject = QString(data[1])
             self.displayActividad.setText(msgProject)
         else:
             msgProject = "ERROR en el almacenamiento de los datos iniciales No existe la Actividad = {0}".format(myAct)
@@ -315,7 +377,7 @@ class MainForm(QDialog,
                     reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                     raise ValueError, "Error al recuperar la actividad inicial"
-                msgProject = unicode("{0}".format(data[3]))
+                msgProject = QString(data[3])
                 self.displayTarea.setText(msgProject)
             else:   
                 msgProject = "ERROR en el almacenamiento de los datos iniciales No existe la Tarea = {0}".format(myTask)
