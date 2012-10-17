@@ -184,7 +184,7 @@ class myDb(object):
                         IdActivity = %s and IdTask = %s""",(IdResource,IdProject,IdActivity,IdTask))
             else:
                 cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
-                        IdActivity = %s""",(IdResource,IdProject,IdActivity))
+                        IdActivity = %s and IdTask is NULL""",(IdResource,IdProject,IdActivity))
             row = cur.fetchone()
             return (True,row)
         except MySQLdb.Error, e:
@@ -355,7 +355,10 @@ class myDb(object):
                     return (False, ("Error IdTaskParent Inexistente",))
             cur.execute ("INSERT INTO Tasks(IdProjectParent,IdTaskParent,Task) VALUES(%s,%s,%s)",(IdProjectParent,IdTaskParent,unicode(Task)))
             self.__conn.commit()
-            cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent = %s and Task like %s",(IdProjectParent,IdTaskParent,unicode(Task)))
+            if IdTaskParent is None:
+                cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent IS NULL and Task = %s",(IdProjectParent,unicode(Task)))
+            else:
+                cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent = %s and Task = %s",(IdProjectParent,IdTaskParent,unicode(Task)))
             row=cur.fetchone()
             return (True, row)
         except MySQLdb.Error, e:

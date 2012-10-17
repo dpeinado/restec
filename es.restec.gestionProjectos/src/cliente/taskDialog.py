@@ -13,7 +13,7 @@ class taskDialog(QDialog):
     '''
     classdocs
     '''
-    def __init__(self, current, myTaskList,myProjLegend, parent=None):
+    def __init__(self, current, myTaskList,myProjId,myProjLegend, parent=None):
         super(taskDialog,self).__init__(parent)
         self.myParent = parent
         self.setMinimumSize(500,200)
@@ -21,6 +21,8 @@ class taskDialog(QDialog):
         self.__current = current
         self.__numberRows = len(myTaskList)
         self.__numberCols = 2
+        self.__projLegend = myProjLegend
+        self.__projId = myProjId
         msgLbl = QString("Tareas del projecto -- %1").arg(myProjLegend)
         treeLabel = QLabel(msgLbl)
         self.tree = QTreeWidget()
@@ -48,19 +50,22 @@ class taskDialog(QDialog):
     def makeNewTask(self):
         myNPD = newTask.newTaskDlg( self.myTaskList, self)
         if myNPD.exec_():
-            ncode = myNPD.myCode.text()
-            ndesc = myNPD.myDesc.text()
-            ok, data = self.myParent.handle_request("SET_NEW_PROJECT",ncode,ndesc)
+            ntask = unicode(myNPD.myTask.text())
+            parentProj = self.__projId
+            parentTask = unicode(self.tree.currentItem().text(1))
+            if parentTask=='-1':
+                parentTask = None
+            ok, data = self.myParent.handle_request("SET_NEW_TASK",parentProj,parentTask,ntask)
             if ok:
                 self.myTaskList.append(data)
                 self.updateTable(str(data[0]))
         else:
-            print "Rechac�"
+            print "Rechacé"
         
     def updateTable(self,current=None):
         self.tree.clear()
         self.tree.setColumnCount(self.__numberCols)
-        self.tree.setColumnHidden(1,True)
+        #self.tree.setColumnHidden(1,True)
         self.tree.setHeaderLabels([QString('IdTarea'),QString("Tarea")])
         self.tree.setEditTriggers(QTreeWidget.NoEditTriggers)
         self.tree.setSelectionBehavior(QTreeWidget.SelectRows)
@@ -69,51 +74,39 @@ class taskDialog(QDialog):
         self.tree.setItemsExpandable(True)
         selected = None
         parentFromTask ={}
+        msgStr1 = QString(self.__projLegend[:4])
+        msgStr2 = QString('-1')
+        rootProject = QTreeWidgetItem(self.tree,[msgStr1,msgStr2])
+        self.tree.expandItem(rootProject)
+        if current is None:
+            selected = rootProject
         for row, task in enumerate(self.myTaskList):
             try:
                 if task[2] is None:
-                    ancestor = QTreeWidgetItem(self.tree, [QString(task[3]), QString(str(task[0]))] )
+                    ancestor = QTreeWidgetItem(rootProject, [QString(task[3]), QString(str(task[0]))] )
                     parentFromTask[task[0]]=ancestor
+                    if current is not None and current == str(task[0]):
+                        selected = ancestor
                 else:
                     ancestor = parentFromTask[task[2]]
                     if ancestor is None:
                         raise ValueError('There is a Task without Parent ??')
                     treeTask = QTreeWidgetItem(ancestor, [QString(task[3]), QString(str(task[0]))] )
+                    if current is not None and current == str(task[0]):
+                        selected = treeTask
                     parentFromTask[task[0]]=treeTask
                     self.tree.expandItem(treeTask)
                 self.tree.expandItem(ancestor)
+                
             except ValueError as e:
                 print "TreeWidget Error ({0}): {1}".format(e.errno, e.strerror)
                 continue
         self.tree.resizeColumnToContents(0)
         self.tree.resizeColumnToContents(1)
-        
-                
-        
-        
-        
-        
-        #=======================================================================
-        # for row, task in enumerate(self.myTaskList):
-        #    val = str(task[0])
-        #    item = QTableWidgetItem(val)
-        #    if current is not None and current == val:
-        #        selected = item           
-        #    self.table.setItem(row,0,item)
-        #    val = task[1]
-        #    item = QTableWidgetItem(val)
-        #    self.table.setItem(row,1,item)
-        #    val = task[2]
-        #    item = QTableWidgetItem(val)
-        #    self.table.setItem(row,2,item)            
-        # self.table.resizeColumnsToContents()
-        # self.table.sortItems(1,Qt.AscendingOrder)
-        # #self.table.repaint()
-        # if selected is not None:
-        #    selected.setSelected(True)
-        #    self.table.setCurrentItem(selected)
-        #    self.table.scrollToItem(selected)    
-        #=======================================================================
+        if selected is not None:
+            selected.setSelected(True)
+            self.tree.setCurrentItem(selected)
+            
         
 if __name__ == "__main__":
     app=QApplication(sys.argv)

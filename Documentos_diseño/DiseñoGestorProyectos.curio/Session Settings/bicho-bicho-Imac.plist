@@ -13,16 +13,23 @@
 	<array/>
 	<key>Expanded Sections</key>
 	<array/>
+	<key>F28E3005-5B2C-47BE-8689-DD8673BB2057</key>
+	<dict>
+		<key>Visible Rect</key>
+		<string>{{0, 0}, {1569, 1298}}</string>
+		<key>Zoom Factor</key>
+		<real>1</real>
+	</dict>
 	<key>InspectorBar RBSplitView Layout</key>
-	<string>2 27 1313.01</string>
+	<string>2 27 1313</string>
 	<key>Last Viewed Ideaspaces</key>
 	<array>
-		<string>549DAB43-E7DB-429D-83E8-B58CD7A3B0EA</string>
+		<string>F28E3005-5B2C-47BE-8689-DD8673BB2057</string>
 	</array>
 	<key>Last Viewed Section</key>
 	<array/>
 	<key>Library RBSplitView Layout</key>
-	<string>2 1313 -581.767H</string>
+	<string>2 1313 -581.886H</string>
 	<key>LibraryPanel.Settings</key>
 	<dict>
 		<key>LibraryPanel.HiddenColumns</key>
@@ -67,7 +74,7 @@
 			</array>
 			<key>CCAsset Kind</key>
 			<array>
-				<real>28</real>
+				<real>500</real>
 				<integer>8</integer>
 			</array>
 			<key>CCAsset Last Modified Date</key>

@@ -183,24 +183,23 @@ class MainForm(QDialog,
         if ok:
             if len(data)==2:
                 myTaskList = list(data[1])
-                myTD = taskDialog.taskDialog(self.__IdTask, myTaskList, self.displayProyecto.text(), self)
+                myTD = taskDialog.taskDialog(self.__IdTask, myTaskList, self.__IdProject,self.displayProyecto.text(), self)
                 if myTD.exec_():
-                    print myTD.tree.currentItem().text(0), myTD.tree.currentItem().text(1)
-                    print "Acepté"
-                #    self.__IdTask = myTD.table.item(myTD.table.currentRow(),0).text()
-                #    itemText1 = myAD.table.item(myAD.table.currentRow(),1).text()
-                #    msgProject = QString("%1").arg(itemText1)
-                #    self.displayActividad.setText(msgProject)
-                #    if (self.__IdResource is None) or (self.__IdProject is None) \
-                #        or (self.__IdActivity is None):
-                #        self.__ready = False
-                #    else:
-                #        self.__ready = True
-                # if self.__ready:
-                #    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
-                #                                   self.__IdResource,self.__IdProject,
-                #                                   self.__IdActivity, self.__IdTask)
-                #    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
+                    #print myTD.tree.currentItem().text(0), myTD.tree.currentItem().text(1)
+                    ntaskid = myTD.tree.currentItem().text(1)
+                    self.__IdTask = ntaskid if ntaskid != '-1' else None
+                    msgProject = QString("%1").arg(myTD.tree.currentItem().text(0)) if self.__IdTask is not None else ""
+                    self.displayTarea.setText(msgProject)
+                if (self.__IdResource is None) or (self.__IdProject is None) \
+                       or (self.__IdActivity is None):
+                    self.__ready = False
+                else:
+                    self.__ready = True
+                if self.__ready:
+                    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
+                                                  self.__IdResource,self.__IdProject,
+                                                  self.__IdActivity, self.__IdTask)
+                    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
                 else:
                     print "Rechacé"
         else:
@@ -275,7 +274,7 @@ class MainForm(QDialog,
         self.setRecursoButton.setEnabled(True)
         self.setTareaButton.setEnabled(True)
         self.setActividadButton.setEnabled(True)
-         
+        self.showTimeFromGo.setText(self.getHHMM(0)) 
         #QMessageBox.warning(self, 'He llegado a Stop','-Go')
     
     def exitApp(self):
@@ -368,7 +367,7 @@ class MainForm(QDialog,
             self.__IdActivity=None
                  
         if myTask is not None:
-            ok, data = self.handle_request("GET_TASK_BYID", myTask, myProj)
+            ok, data = self.handle_request("GET_TASK_BYID", myProj, myTask)
             if ok:
                 if myTask != str(data[0]):
                     msgProject = "Salir del programa INMEDIATAMENTE, IdActivity = {0}, Valor devuelto = {1}".format(myTask, str(data[0]))
