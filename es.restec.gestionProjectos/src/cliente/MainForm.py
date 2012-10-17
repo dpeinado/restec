@@ -17,6 +17,7 @@ import ui_mainform
 import projectDialog
 import resourceDialog
 import activityDialog
+import taskDialog
 
 
 TIMEINTERVAL = 3000
@@ -80,6 +81,7 @@ class MainForm(QDialog,
         self.setProyectoButton.clicked.connect(self.setProject)
         self.setRecursoButton.clicked.connect(self.setResource)
         self.setActividadButton.clicked.connect(self.setActivity)
+        self.setTareaButton.clicked.connect(self.setTask)
 
         self.stopButton.setEnabled(False)
         self.goButton.setEnabled(False)
@@ -181,10 +183,10 @@ class MainForm(QDialog,
         if ok:
             if len(data)==2:
                 myTaskList = list(data[1])
-                pass
-                #===============================================================
-                # myTD = taskDialog.taskDialog(self.__IdTask, myTaskList, self)
-                # if myTD.exec_():
+                myTD = taskDialog.taskDialog(self.__IdTask, myTaskList, self.displayProyecto.text(), self)
+                if myTD.exec_():
+                    print myTD.tree.currentItem().text(0), myTD.tree.currentItem().text(1)
+                    print "Acepté"
                 #    self.__IdTask = myTD.table.item(myTD.table.currentRow(),0).text()
                 #    itemText1 = myAD.table.item(myAD.table.currentRow(),1).text()
                 #    msgProject = QString("%1").arg(itemText1)
@@ -199,10 +201,10 @@ class MainForm(QDialog,
                 #                                   self.__IdResource,self.__IdProject,
                 #                                   self.__IdActivity, self.__IdTask)
                 #    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
-                # else:
-                #    print "Rechacé"
-                #===============================================================
-        pass  
+                else:
+                    print "Rechacé"
+        else:
+            print "problemas ,, not ok"  
     
     def getHHMM(self,timeEntry):
         if timeEntry is None:

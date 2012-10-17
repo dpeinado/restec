@@ -70,6 +70,7 @@ class projectDialog(QDialog):
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QTableWidget.SingleSelection)
+        self.table.setSortingEnabled(False)
         selected = None
         for row, project in enumerate(self.myProjectList):
             val = str(project[0])
@@ -84,6 +85,7 @@ class projectDialog(QDialog):
             item = QTableWidgetItem(val)
             self.table.setItem(row,2,item)            
         self.table.resizeColumnsToContents()
+        self.table.setSortingEnabled(True)
         self.table.sortItems(1,Qt.AscendingOrder)
         #self.table.repaint()
         if selected is not None:

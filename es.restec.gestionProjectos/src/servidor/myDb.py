@@ -147,7 +147,8 @@ class myDb(object):
     def get_task_list(self, IdProject):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Tasks WHERE IdProjectParent = %s", (IdProject,))
+            cur.execute("""SELECT * from Tasks WHERE IdProjectParent = %s 
+                order by IdTaskParent""", (IdProject,))
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])

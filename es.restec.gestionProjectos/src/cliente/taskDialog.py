@@ -13,18 +13,18 @@ class taskDialog(QDialog):
     '''
     classdocs
     '''
-    def __init__(self, current, myTaskList,parent=None):
+    def __init__(self, current, myTaskList,myProjLegend, parent=None):
         super(taskDialog,self).__init__(parent)
         self.myParent = parent
         self.setMinimumSize(500,200)
         self.myTaskList = myTaskList
         self.__current = current
         self.__numberRows = len(myTaskList)
-        self.__numberCols = 3
-        tableLabel = QLabel("Tareas")
-        self.table = QTreeWidget()
-        #self.myTable=QLineEdit()
-        tableLabel.setBuddy(self.table)
+        self.__numberCols = 2
+        msgLbl = QString("Tareas del projecto -- %1").arg(myProjLegend)
+        treeLabel = QLabel(msgLbl)
+        self.tree = QTreeWidget()
+        treeLabel.setBuddy(self.tree)
         okButton = QPushButton("&Ok")
         cancelButton = QPushButton("Cancel")
         newButton = QPushButton("Tarea &Nueva")
@@ -34,8 +34,8 @@ class taskDialog(QDialog):
         hbox.addStretch()
         hbox.addWidget(newButton)
         layout=QVBoxLayout()
-        layout.addWidget(tableLabel)
-        layout.addWidget(self.table)
+        layout.addWidget(treeLabel)
+        layout.addWidget(self.tree)
         layout.addLayout(hbox)
         self.setLayout(layout)
         
@@ -58,43 +58,61 @@ class taskDialog(QDialog):
             print "Rechac�"
         
     def updateTable(self,current=None):
-        self.table.clear()
-        self.table.setRowCount(len(self.myTaskList)) 
-        self.table.setColumnCount(self.__numberCols) 
-        self.table.setColumnHidden(0,True)
-        self.table.verticalHeader().setVisible(False)
-        tmp1 = QString("C�digo")
-        tmp2 = QString("Descripci�n")
-        self.table.setHorizontalHeaderLabels([QString("Id"), tmp1,  tmp2])
-        self.table.setAlternatingRowColors(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.table.setSelectionMode(QTableWidget.SingleSelection)
+        self.tree.clear()
+        self.tree.setColumnCount(self.__numberCols)
+        self.tree.setColumnHidden(1,True)
+        self.tree.setHeaderLabels([QString('IdTarea'),QString("Tarea")])
+        self.tree.setEditTriggers(QTreeWidget.NoEditTriggers)
+        self.tree.setSelectionBehavior(QTreeWidget.SelectRows)
+        self.tree.setSelectionMode(QTreeWidget.SingleSelection)
+
+        self.tree.setItemsExpandable(True)
         selected = None
+        parentFromTask ={}
         for row, task in enumerate(self.myTaskList):
-            val = str(task[0])
-            item = QTableWidgetItem(val)
-            if current is not None and current == val:
-                selected = item           
-            self.table.setItem(row,0,item)
-            val = task[1]
-            item = QTableWidgetItem(val)
-            self.table.setItem(row,1,item)
-            val = task[2]
-            item = QTableWidgetItem(val)
-            self.table.setItem(row,2,item)            
-        self.table.resizeColumnsToContents()
-        self.table.sortItems(1,Qt.AscendingOrder)
-        #self.table.repaint()
-        if selected is not None:
-            selected.setSelected(True)
-            self.table.setCurrentItem(selected)
-            self.table.scrollToItem(selected)    
+            try:
+                if task[2] is None:
+                    ancestor = QTreeWidgetItem(self.tree, [QString(task[3]), QString(str(task[0]))] )
+                    parentFromTask[task[0]]=ancestor
+                else:
+                    ancestor = parentFromTask[task[2]]
+                    if ancestor is None:
+                        raise ValueError('There is a Task without Parent ??')
+                    treeTask = QTreeWidgetItem(ancestor, [QString(task[3]), QString(str(task[0]))] )
+                    parentFromTask[task[0]]=treeTask
+                    self.tree.expandItem(treeTask)
+                self.tree.expandItem(ancestor)
+            except ValueError as e:
+                print "TreeWidget Error ({0}): {1}".format(e.errno, e.strerror)
+                continue
+        self.tree.resizeColumnToContents(0)
+        self.tree.resizeColumnToContents(1)
+        
+                
+        
+        
+        
+        
         #=======================================================================
-        # self.table.clear()
-        # self.table.setRowCount(len(self.movies))
-        # self.table.setColumnCount(5) 
-        # self.table.setHorizontalHeaderLabels(["Title", "Year", "Mins","Acquired", "Notes"])
+        # for row, task in enumerate(self.myTaskList):
+        #    val = str(task[0])
+        #    item = QTableWidgetItem(val)
+        #    if current is not None and current == val:
+        #        selected = item           
+        #    self.table.setItem(row,0,item)
+        #    val = task[1]
+        #    item = QTableWidgetItem(val)
+        #    self.table.setItem(row,1,item)
+        #    val = task[2]
+        #    item = QTableWidgetItem(val)
+        #    self.table.setItem(row,2,item)            
+        # self.table.resizeColumnsToContents()
+        # self.table.sortItems(1,Qt.AscendingOrder)
+        # #self.table.repaint()
+        # if selected is not None:
+        #    selected.setSelected(True)
+        #    self.table.setCurrentItem(selected)
+        #    self.table.scrollToItem(selected)    
         #=======================================================================
         
 if __name__ == "__main__":
