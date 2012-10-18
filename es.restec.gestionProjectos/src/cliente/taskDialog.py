@@ -74,7 +74,7 @@ class taskDialog(QDialog):
         self.tree.setItemsExpandable(True)
         selected = None
         parentFromTask ={}
-        msgStr1 = QString(self.__projLegend[:4])
+        msgStr1 = QString(self.__projLegend[:5])
         msgStr2 = QString('-1')
         rootProject = QTreeWidgetItem(self.tree,[msgStr1,msgStr2])
         self.tree.expandItem(rootProject)

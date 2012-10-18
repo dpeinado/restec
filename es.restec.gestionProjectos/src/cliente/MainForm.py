@@ -104,10 +104,15 @@ class MainForm(QDialog,
                 myProjectList = list(data[1])
                 myPD = projectDialog.projectDialog(self.__IdProject, myProjectList, self)
                 if myPD.exec_():
-                    self.__IdProject = myPD.table.item(myPD.table.currentRow(),0).text()
+                    newProjectId = myPD.table.item(myPD.table.currentRow(),0).text()
+                    if newProjectId != self.__IdProject:
+                        self.__IdTask = None
+                        self.__IdProject = newProjectId
+                        self.displayTarea.setText('')
                     itemText1 = myPD.table.item(myPD.table.currentRow(),1).text()
                     itemText2 = myPD.table.item(myPD.table.currentRow(),2).text()
                     msgProject = QString("%1: %2").arg(itemText1).arg(itemText2)
+                    
                     #msgProject = "{0}: {1}".format(itemText1, itemText2)
                     self.displayProyecto.setText(msgProject)
                     if (self.__IdResource is None) or (self.__IdProject is None) \
@@ -179,6 +184,8 @@ class MainForm(QDialog,
 
     def setTask(self):
         print "Estoy en setTask"
+        if self.__IdProject is None:
+            return
         ok, data = self.handle_request("GET_TASK_LIST", self.__IdProject)
         if ok:
             if len(data)==2:

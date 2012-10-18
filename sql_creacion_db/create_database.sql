@@ -6,7 +6,7 @@ use projects;
 
 CREATE TABLE IF NOT EXISTS Projects(
 	IdProject INT AUTO_INCREMENT, 
-    Code CHAR(3) not null, 
+    Code CHAR(5) not null, 
     Description varchar(80) not null,
     PRIMARY KEY(IdProject)
 ) ENGINE=INNODB character set utf8;

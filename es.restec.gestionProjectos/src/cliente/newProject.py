@@ -24,14 +24,14 @@ class newProjectDlg(QDialog):
         self.myDesc = QLineEdit("")
         codeLabel.setBuddy(self.myCode)
         descLabel.setBuddy(self.myDesc)
-        self.myCode.setInputMask("999")
+        self.myCode.setInputMask("AA999")
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.myCode.sizePolicy().hasHeightForWidth())
         self.myCode.setSizePolicy(sizePolicy)
-        self.myCode.setMinimumSize(QSize(40, 22))
-        self.myCode.setMaximumSize(QSize(40, 22))
+        self.myCode.setMinimumSize(QSize(60, 22))
+        self.myCode.setMaximumSize(QSize(60, 22))
         self.myCode.setMaxLength(3)
         okButton = QPushButton("&Ok")
         cancelButton = QPushButton("Cancel")
@@ -55,7 +55,13 @@ class newProjectDlg(QDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))              
         
     def validateCode(self):
-        newCode = self.myCode.text()
+        newCode = self.myCode.text().toUpper()
+        if not (newCode.startsWith('PR') or newCode.startsWith('OF')):
+            self.myCode.selectAll()
+            self.myCode.setFocus()
+            self.msgLabel.setText("El código empieza por PR u OF")
+            return
+        self.myCode.setText(newCode)
         codes = []
         for projs in self.myProjectList:
             codes.append(projs[1])
@@ -65,7 +71,6 @@ class newProjectDlg(QDialog):
             self.msgLabel.setText("Existe un projecto con ese Codigo")
         else:
             self.msgLabel.setText("Codigo correcto")
-        pass
     
     
     
