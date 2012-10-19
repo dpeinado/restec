@@ -1,7 +1,7 @@
 set character_set_database=UTF8;
 drop database if exists projects;
 create database projects character set 'UTF8';
-grant all on projects.* to 'puser'@'localhost' identified by 'pu8549';
+grant all on projects.* to 'puser'@'PUESTO_4' identified by 'pu8549';
 use projects;
 
 CREATE TABLE IF NOT EXISTS Projects(
@@ -74,7 +74,7 @@ end;
 |
 delimiter ;
 
-load data infile '/Users/bicho/restec/sql_creacion_db/projects.txt' into table Projects character set UTF8 fields terminated by '\t' (Code, Description) set IdProject = NULL;
-load data infile '/Users/bicho/restec/sql_creacion_db/resources.txt' into table Resources character set UTF8 fields terminated by '\t' (Name, Cost) set IdResource = NULL;
-load data infile '/Users/bicho/restec/sql_creacion_db/activities.txt' into table Activities character set UTF8 fields terminated by '\t' (Activity) set IdActivity = NULL;
+load data infile 'C:/DOCUMENTOS.DIEGO/GitHub/restec/sql_creacion_db/projects.txt' into table Projects character set UTF8 fields terminated by '\t' lines terminated by '\r\n' (Code, Description) set IdProject = NULL;
+load data infile 'C:/DOCUMENTOS.DIEGO/GitHub/restec/sql_creacion_db/resources.txt' into table Resources character set UTF8 fields terminated by '\t' lines terminated by '\r\n' (Name, Cost) set IdResource = NULL;
+load data infile 'C:/DOCUMENTOS.DIEGO/GitHub/restec/sql_creacion_db/activities.txt' into table Activities character set UTF8 fields terminated by '\t' lines terminated by '\r\n' (Activity) set IdActivity = NULL;
 
