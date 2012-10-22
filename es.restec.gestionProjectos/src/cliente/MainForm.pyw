@@ -416,7 +416,7 @@ if __name__ == "__main__":
     host = sys.argv[1]
     try:
         port = int(sys.argv[2])
-    except Excepton as err:
+    except Exception as err:
         print "Error conversión del puerto a entero", err
 
     app = QApplication(sys.argv)

@@ -192,8 +192,30 @@ class myDb(object):
             return (False, ("Error en get_task_entries_timeTotal"))
         finally:
             if cur:
-                cur.close()    
-    
+                cur.close()
+    def get_info_entries(self):
+        try:
+            ok, data = self.get_project_list()
+            projs = data[1][1]
+            
+            cur=self.__conn.cursor()
+            cur.execute("""select idproject, idtask, idresource, idactivity, sum(tsec) from 
+            (select idproject, idtask, idresource, idactivity, tsec from 
+            entries order by idproject, idtask, idresource, idactivity) as t 
+            group by t.idproject, t.idtask, t.idresource, t.idactivity
+            """)
+            desc = cur.description
+            rows = cur.fetchall()
+            cabeceras = tuple([cab[0] for cab in desc])
+            cur.execute(" select * from tasks order by idprojectparent, idtaskparent")
+            taskStructure=cur.fetchall()
+            return (True,(cabeceras,rows,taskStructure))
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e.args)
+            return (False, ("Error en get_entries_list",))
+        finally:
+            if cur:
+                cur.close()        
     def get_entries_list(self, grouping):
         """Grouping:
                 0, no grouping at all

@@ -18,6 +18,8 @@ class Finish(Exception): pass
 class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
     # Static data -> the list of myDb functions
     Call = dict(
+        GET_INFO_ENTRIES=(
+            lambda self, *args: self.server.myDataBase.get_info_entries(*args)),                          
         GET_PROJECT_LIST=(
             lambda self, *args: self.server.myDataBase.get_project_list(*args)),
         GET_PROJECT_BYID=(

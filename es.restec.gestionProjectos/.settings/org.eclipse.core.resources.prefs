@@ -1,10 +1,14 @@
 eclipse.preferences.version=1
 encoding//src/cliente/MainForm.py=UTF-8
+encoding//src/cliente/MainForm.pyw=UTF-8
 encoding//src/cliente/activityDialog.py=US-ASCII
+encoding//src/cliente/newActivity.py=US-ASCII
 encoding//src/cliente/newProject.py=UTF-8
-encoding//src/cliente/newTask.py=UTF-8
+encoding//src/cliente/newTask.py=US-ASCII
 encoding//src/cliente/projectDialog.py=UTF-8
 encoding//src/cliente/taskDialog.py=UTF-8
 encoding//src/cliente/ui_mainform.py=UTF-8
+encoding//src/management/managementConsole.py=UTF-8
+encoding//src/servidor/TrackProjectsServer.pyw=UTF-8
 encoding//src/servidor/myDb.py=UTF-8
 encoding//src/servidor/pyTestServer.py=UTF-8

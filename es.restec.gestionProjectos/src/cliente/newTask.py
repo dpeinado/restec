@@ -17,7 +17,7 @@ class newTaskDlg(QDialog):
         super(newTaskDlg,self).__init__(parent)
         self.setMinimumSize(500,200)
         self.myTaskList = myTaskList
-        msgText = "Esta actividad va a colgar de:\n {}".format(parent.tree.currentItem().text(0))
+        msgText = QString("Esta actividad va a colgar de:\n %1").arg(parent.tree.currentItem().text(0))
         self.msgLabel = QLabel(msgText)
         taskLabel = QLabel("Tarea")
         self.myTask = QLineEdit("")
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     form = newTaskDlg(tasks)
     form.show()
     if form.exec_():
-        print "AceptŽ"
+        print "Acept������"
     else:
-        print "CancelŽ"
+        print "Cancel������"
         
