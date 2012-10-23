@@ -86,5 +86,6 @@ if __name__ == "__main__":
     form.show()
     form.exec_()
     #form.closeEvent('a')
-    sys.exit()
     print "He acabado"
+    sys.exit()
+  

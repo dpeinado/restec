@@ -196,20 +196,28 @@ class myDb(object):
     def get_info_entries(self):
         try:
             ok, data = self.get_project_list()
-            projs = data[1][1]
+            proyectos = data[1]
+            misProyectos={}
+            misTareas={}
+            salida = []
+            for pp in proyectos:
+                misProyectos[pp[0]] = "{0}: {1}".format(pp[1],pp[2])
             
             cur=self.__conn.cursor()
             cur.execute("""select idproject, idtask, idresource, idactivity, sum(tsec) from 
             (select idproject, idtask, idresource, idactivity, tsec from 
             entries order by idproject, idtask, idresource, idactivity) as t 
             group by t.idproject, t.idtask, t.idresource, t.idactivity
-            """)
-            desc = cur.description
-            rows = cur.fetchall()
-            cabeceras = tuple([cab[0] for cab in desc])
+            """)            
+            entradas = cur.fetchall()            
+                        
             cur.execute(" select * from tasks order by idprojectparent, idtaskparent")
-            taskStructure=cur.fetchall()
-            return (True,(cabeceras,rows,taskStructure))
+            tareas=cur.fetchall()                            
+            for tt in tareas:
+                misTareas[tt[0]] = tt[1:]
+            
+            
+            return (True,(entradas,proyectos,tareas))
         except MySQLdb.Error, e:
             print "Error {0}".format(e.args)
             return (False, ("Error en get_entries_list",))

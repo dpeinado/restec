@@ -87,7 +87,7 @@ if __name__ == "__main__":
     host = sys.argv[1]
     try:
         port = int(sys.argv[2])
-    except Excepton as err:
+    except Exception as err:
         print "Error conversión del puerto a entero", err
 
     try:
@@ -96,6 +96,7 @@ if __name__ == "__main__":
         if not server.myDataBase.connect():
             sys.exit(1)
         print "Server a la escucha"
+        ok, data = server.myDataBase.get_info_entries()
         server.serve_forever()
     except Exception as err:
         print("ERROR", err)
