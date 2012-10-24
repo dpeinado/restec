@@ -96,7 +96,7 @@ if __name__ == "__main__":
         if not server.myDataBase.connect():
             sys.exit(1)
         print "Server a la escucha"
-        ok, data = server.myDataBase.get_info_entries()
+        #ok, data = server.myDataBase.get_info_entries()        
         server.serve_forever()
     except Exception as err:
         print("ERROR", err)

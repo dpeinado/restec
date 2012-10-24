@@ -8,6 +8,15 @@ Created on 02/10/2012
 import MySQLdb
 #import sys
 
+class lineaResumen(object):
+    pass
+    def __init__(self,s1,s2,s3,s4,t=0.0):
+        self.str1=s1
+        self.str2=s2
+        self.str3=s3
+        self.str4=s4
+        self.myT = t
+
 class myDb(object):
     '''
     Clase mi base de datos. Se encarga de interaccionar con la base de datos MySql
@@ -144,11 +153,14 @@ class myDb(object):
             if cur:
                 cur.close()    
 
-    def get_task_list(self, IdProject):
+    def get_task_list(self, IdProject=None):
+        if IdProject is None:
+            queryStr = "SELECT * from Tasks"
+        else:
+            queryStr = "select * from tasks where IdProjectParent = '{}'".format(IdProject)
         try:
-            cur=self.__conn.cursor()
-            cur.execute("""SELECT * from Tasks WHERE IdProjectParent = %s 
-                order by IdTaskParent""", (IdProject,))
+            cur=self.__conn.cursor()            
+            cur.execute(queryStr)
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
@@ -195,29 +207,14 @@ class myDb(object):
                 cur.close()
     def get_info_entries(self):
         try:
-            ok, data = self.get_project_list()
-            proyectos = data[1]
-            misProyectos={}
-            misTareas={}
-            salida = []
-            for pp in proyectos:
-                misProyectos[pp[0]] = "{0}: {1}".format(pp[1],pp[2])
-            
             cur=self.__conn.cursor()
             cur.execute("""select idproject, idtask, idresource, idactivity, sum(tsec) from 
             (select idproject, idtask, idresource, idactivity, tsec from 
             entries order by idproject, idtask, idresource, idactivity) as t 
             group by t.idproject, t.idtask, t.idresource, t.idactivity
             """)            
-            entradas = cur.fetchall()            
-                        
-            cur.execute(" select * from tasks order by idprojectparent, idtaskparent")
-            tareas=cur.fetchall()                            
-            for tt in tareas:
-                misTareas[tt[0]] = tt[1:]
-            
-            
-            return (True,(entradas,proyectos,tareas))
+            entradas = cur.fetchall()                                    
+            return (True,entradas)
         except MySQLdb.Error, e:
             print "Error {0}".format(e.args)
             return (False, ("Error en get_entries_list",))

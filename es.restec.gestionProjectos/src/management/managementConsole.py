@@ -37,8 +37,34 @@ class mmForm(QDialog,
         self.updateUi()
 
     def updateUi(self):
-        ok, data = self.handle_request("GET_INFO_ENTRIES")
+        ok, data = self.handle_request("GET_PROJECT_LIST")
+        proyectos = data[1]
+        misProyectos={}
+        misTareas={}
+        salida = []
+        for pp in proyectos:
+            misProyectos[pp[0]] = "{0}: {1}".format(pp[1],pp[2])                  
+                
+        ok, data=self.handle_request("GET_TASK_LIST")                            
+        tareas = data[1]
+        for tt in tareas:
+            misTareas[tt[0]] = tt[1:]
+        ok, entradas = self.handle_request("GET_INFO_ENTRIES")
+        
+        listaTareas=[]
+        for tt in tareas:
+            estTareas=[]
+            estTareas.append(tt[0])
+            if tt[2] is None:
+                estTareas.append(tt[1])
+                continue
+            Tp = tt[2]
+            self.make_TaskList(estTareas,Tp)
+                
+        
+    def getTaskParent(self,myTasks,myList,Tp):
         pass
+
 
     def handle_request(self, *items, **kwargs):
         wait_for_reply=kwargs.pop('wait_for_reply', True)
