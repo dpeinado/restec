@@ -37,6 +37,9 @@ class mmForm(QDialog,
         self.updateUi()
 
     def updateUi(self):
+        
+        # obtengo la lista de proyectos, y la guardo en un diccionario
+        # para poder acceder en función del número de proyecto
         ok, data = self.handle_request("GET_PROJECT_LIST")
         proyectos = data[1]
         misProyectos={}
@@ -44,26 +47,50 @@ class mmForm(QDialog,
         salida = []
         for pp in proyectos:
             misProyectos[pp[0]] = "{0}: {1}".format(pp[1],pp[2])                  
-                
+        # obtengo la lista de tareas y la guardo en un diccionario
+        # para poder acceder en fución del número de tarea
         ok, data=self.handle_request("GET_TASK_LIST")                            
         tareas = data[1]
         for tt in tareas:
             misTareas[tt[0]] = tt[1:]
+        # obtengo la lista de entradas
         ok, entradas = self.handle_request("GET_INFO_ENTRIES")
         
+        # para poder confeccionar el árbol de tareas y proyectos hago 
+        # una lista de listas de los predecesores de cada tarea.
+        # termina en el número de proyecto.
+        # para poder luego hacer la estructura directamente la ordeno
+        # primer por número de tarea (primer elemento de la lista), y 
+        # luego por la longitud de la lista (número de elementos)
         listaTareas=[]
         for tt in tareas:
             estTareas=[]
             estTareas.append(tt[0])
             if tt[2] is None:
                 estTareas.append(tt[1])
+                listaTareas.append(estTareas)
                 continue
             Tp = tt[2]
-            self.make_TaskList(estTareas,Tp)
-                
+            estTareas.append(Tp)
+            self.getTaskParent(misTareas, estTareas,Tp)
+            listaTareas.append(estTareas)
+        listaTareas.sort(key = lambda row: row[0])
+        listaTareas.sort(key = lambda row: len(row))
+        # ya tengo la lista de listas ordenada
         
-    def getTaskParent(self,myTasks,myList,Tp):
+        
         pass
+            
+    def getTaskParent(self,myTasks, myList,Tp):
+        Tpp = myTasks[Tp][1]
+        if Tpp is None:
+            P = myTasks[Tp][0]
+            myList.append(P)
+            return
+        else:
+            myList.append(Tpp)
+            self.getTaskParent(myTasks,myList,Tpp)        
+
 
 
     def handle_request(self, *items, **kwargs):
