@@ -7,6 +7,8 @@ use proj;
 CREATE TABLE IF NOT EXISTS Projects(
 	IdProject INT AUTO_INCREMENT,
 	IdProjectParent INT,
+	lft INT,
+	rgt INT,
 	Code CHAR(5) not null, 
 	Description varchar(150) not null,
 	PRIMARY KEY(IdProject),
