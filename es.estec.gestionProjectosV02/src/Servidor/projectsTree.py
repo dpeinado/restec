@@ -10,8 +10,6 @@ class projectsTree(object):
     '''
     Clase que encapsula la estructura de datos del �rbol de proyectos
     '''
-
-
     def __init__(self, connDB):
         '''
         Inicializa el conector a la base de datos
@@ -59,7 +57,7 @@ class projectsTree(object):
                 if(len(right)>0):
                     while right[-1] < row[1]:
                         right.pop()
-                msgStr=' '*5*len(right)+ "{0}: {1}".format(row[3],row[4])
+                msgStr=' '*5*len(right)+ "{0} {1}: {2}".format(row[0], row[3],row[4])
                 print msgStr
                 right.append(row[2])
         except MySQLdb.Error, e:
@@ -163,15 +161,114 @@ class projectsTree(object):
             print "Error {0}".format(e)
         return right + 1   
 
+class resultsTree(object):
+    '''
+    Clase que encapsula la estructura de datos del �rbol de resultados
+    '''
+    def __init__(self, connDB):
+        '''
+        Inicializa el conector a la base de datos
+        '''
+        self.conn = connDB
+
+    def display_children(self,root):
+        try:
+            cur = self.conn.cursor() 
+            # retrieve left and right value of the root node
+            msgStr="SELECT lft, rgt FROM tmpResults where Idproject = {}".format(root)        
+            cur.execute(msgStr)   
+            row = cur.fetchone()
+            # start with an empty right stack
+            right = [];
+            # retrieve all descendants of the root node
+            msgStr="""SELECT IdProject, lft, rgt , Tsec FROM tmpResults WHERE
+                        lft BETWEEN {0} AND {1} ORDER BY lft ASC""".format(row[0],row[1])
+            cur.execute(msgStr)
+            data = cur.fetchall()
+            cur.close()
+            for row in data:
+                if(len(right)>0):
+                    while right[-1] < row[1]:
+                        right.pop()
+                msgStr=' '*5*len(right)+ "{0} --> {1}".format(row[0], row[3])
+                print msgStr
+                right.append(row[2])
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            
+    def path_node(self,node):
+        try:
+            cur = self.conn.cursor() 
+            # retrieve left and right value of the root node
+            msgStr="SELECT lft, rgt FROM tmpResults where Idproject = {}".format(node)        
+            cur.execute(msgStr)   
+            row = cur.fetchone()
+            msgStr="""SELECT IdProject FROM tmpResults WHERE
+                        lft < {0} AND rgt > {1} ORDER BY lft ASC""".format(row[0],row[1])
+            cur.execute(msgStr)
+            data = cur.fetchall()
+            cur.close()
+            pathnode=[]           
+            for row in data:
+                pathnode.append(row[0])
+            pathnode.append(node)
+            cur.close()
+            return pathnode
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+    def numberDescendents(self,node):
+        try:
+            cur = self.conn.cursor() 
+            # retrieve left and right value of the root node
+            msgStr="SELECT lft, rgt FROM tmpResults where Idproject = {}".format(node)        
+            cur.execute(msgStr)   
+            row = cur.fetchone()
+            cur.close()        
+            return (row[1]-row[0]-1)/2                                    
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)                                    
+                                                        
+    def rebuild_tree(self, parent, left):
+        # the right value of this node is the left value + 1
+        # ahora mismo este valor no es el de right. Al final de la recurrencia lo ser�. Ahora es solo
+        # El valor left del pr�ximo nivel    
+        right = left+1  
+        # get all children of this node
+        try:
+            cur = self.conn.cursor() 
+            msgStr="SELECT IdProject FROM tmpResults where IdprojectParent = {}".format(parent)        
+            cur.execute(msgStr)   
+            result = cur.fetchall()
+            for row in result:
+                right = self.rebuild_tree(row[0],right) 
+            msgStr="UPDATE tmpResults SET lft = {0}, rgt = {1} WHERE IdProject = {2}".format(left,right,parent)
+            cur.execute(msgStr)
+            #self.conn.commit()
+            cur.close()        
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+        return right + 1       
+
 def get_entries(myP):
     try:
         cur=myP.conn.cursor()
-        msgStr="select idproject,idresource, idactivity, sum(Tsec)/60 from entries group by idproject,idresource,idactivity"
+        msgStr="select idproject,idresource, idactivity, sum(Tsec)/60 from entries group by idproject,idresource,idactivity order by idproject"
         cur.execute(msgStr)
         data = cur.fetchall()
+        myL = []
         result={}
         for row in data:
-            result[row[0]]=row
+            myP = row[0]
+            if len(myL)==0:
+                myL.append(row)
+            else:
+                prevP = myL[-1][0]
+                if myP == prevP:
+                    myL.append(row)
+                else:
+                    result[prevP]=myL
+                    myL=[row]
+        result[prevP]=myL
         return result
     except MySQLdb.Error, e:
         print "Error {0}".format(e)    
@@ -179,7 +276,7 @@ def get_entries(myP):
     
 if __name__ == "__main__":
     myDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'proj',charset="utf8",use_unicode=True)
-    myProjs = projectsTree(myDB)
+    myProjs = projectsTree(myDB)    
     #===========================================================================
     myProjs.rebuild_tree(1, 1)
     # myProjs.display_children_AL(1, 0)
@@ -195,15 +292,33 @@ if __name__ == "__main__":
     # myProjs.conn.commit()
     #===========================================================================
     
-    #===========================================================================
-    # cuantos = get_entries(myProjs)
-    # entradas = cuantos.keys()
-    # for ent in entradas:
-    #    myCamino = myProjs.path_node(ent)[1:]
-    #    topProj = myCamino[0]
-    #    lastProj=myCamino[-1]
-    #    print topProj,lastProj,cuantos[lastProj]
-    #    print '***************************'
-    #===========================================================================
+    entries= get_entries(myProjs)
+    projWithEntries = sorted(entries.keys())
 
-  
+    cur=myDB.cursor()
+    
+    cur.execute("DROP TABLE IF EXISTS tmp1")
+    cur.execute("CREATE TABLE tmp1(Id INT PRIMARY KEY AUTO_INCREMENT, IdProject INT, IdProjectParent INT, IdResource INT, IdActivity INT, Tsec real) ENGINE=INNODB character set utf8")
+    cur.execute("TRUNCATE tmp1")    
+    for mP in projWithEntries:        
+        myC = myProjs.path_node(mP)
+        for myE in entries[mP]:
+            for upP in myC:                            
+                myPPath = myProjs.path_node(upP)
+                if len(myPPath)==1:
+                    msgStr="INSERT INTO tmp1(IdProject,IdResource,IdActivity,Tsec) VALUES({0},{1},{2},{3})".format(upP, myE[1], myE[2], myE[3])
+                else:
+                    myPP = myPPath[-2]
+                    msgStr="INSERT INTO tmp1(IdProject,IdProjectParent,IdResource,IdActivity,Tsec) VALUES({0},{1},{2},{3},{4})".format(upP, myPP, myE[1], myE[2], myE[3])
+                cur.execute(msgStr)                
+    myDB.commit()
+    cur.execute("DROP TABLE IF EXISTS tmpResults")
+    cur.execute("CREATE TABLE tmpResults(Id INT PRIMARY KEY AUTO_INCREMENT, IdProject INT, IdProjectParent INT, lft INT, rgt INT, Tsec real) ENGINE=INNODB character set utf8 ")
+    msgStr = "INSERT INTO tmpResults(IdProject,IdProjectParent,Tsec) SELECT idproject,idprojectparent,sum(tsec) from tmp1 group by idproject order by idproject"            
+    cur.execute(msgStr)
+    myDB.commit()
+    myRes = resultsTree(myDB)
+    myRes.rebuild_tree(1,1)
+    myDB.commit()
+    myRes.display_children(1)
+    pass                    
