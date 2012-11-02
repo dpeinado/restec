@@ -181,9 +181,9 @@ if __name__ == "__main__":
     myDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'proj',charset="utf8",use_unicode=True)
     myProjs = projectsTree(myDB)
     #===========================================================================
-    # myProjs.rebuild_tree(1, 1)
+    myProjs.rebuild_tree(1, 1)
     # myProjs.display_children_AL(1, 0)
-    # myProjs.display_children(1) 
+    myProjs.display_children(1) 
     # myPath = myProjs.path_node(55)
     # print myPath
     # for i in range(1,56):
@@ -195,13 +195,15 @@ if __name__ == "__main__":
     # myProjs.conn.commit()
     #===========================================================================
     
-    cuantos = get_entries(myProjs)
-    entradas = cuantos.keys()
-    for ent in entradas:
-        myCamino = myProjs.path_node(ent)[1:]
-        topProj = myCamino[0]
-        lastProj=myCamino[-1]
-        print topProj,lastProj,cuantos[lastProj]
-        print '***************************'
+    #===========================================================================
+    # cuantos = get_entries(myProjs)
+    # entradas = cuantos.keys()
+    # for ent in entradas:
+    #    myCamino = myProjs.path_node(ent)[1:]
+    #    topProj = myCamino[0]
+    #    lastProj=myCamino[-1]
+    #    print topProj,lastProj,cuantos[lastProj]
+    #    print '***************************'
+    #===========================================================================
 
   
