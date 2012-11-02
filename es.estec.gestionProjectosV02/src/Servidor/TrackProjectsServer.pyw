@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     try:
         server = ThreadServer((host,port), MyDbServerManagerRequestHandler)
-        server.myDataBase=myDb.myDb(host, 'puser','pu8549','projects')
+        server.myDataBase=myDb.myDb(host, 'puser','pu8549','proj')
         if not server.myDataBase.connect():
             sys.exit(1)
         print "Server a la escucha"

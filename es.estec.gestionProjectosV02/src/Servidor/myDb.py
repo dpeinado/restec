@@ -63,7 +63,7 @@ class myDb(object):
     def get_project_list(self):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Projects order by Code")
+            cur.execute("SELECT * from Projects WHERE IdProjectParent = 1 order by Code")
             desc = cur.description
             rows = cur.fetchall()
             cabeceras = tuple([cab[0] for cab in desc])
@@ -153,29 +153,32 @@ class myDb(object):
             if cur:
                 cur.close()    
 
-    def get_task_list(self, IdProject=None):
-        if IdProject is None:
-            queryStr = "SELECT * from Tasks"
-        else:
-            queryStr = "select * from tasks where IdProjectParent = '{}'".format(IdProject)
-        try:
-            cur=self.__conn.cursor()            
-            cur.execute(queryStr)
-            desc = cur.description
-            rows = cur.fetchall()
-            cabeceras = tuple([cab[0] for cab in desc])
-            return (True,(cabeceras,rows))
-        except MySQLdb.Error, e:
-            print "Error {0}".format(e)
-            return (False, ("Error en get_Task_list",))
-        finally:
-            if cur:
-                cur.close()
+
+    #===========================================================================
+    # def get_task_list(self, IdProject=None):
+    #    if IdProject is None:
+    #        queryStr = "SELECT * from Tasks"
+    #    else:
+    #        queryStr = "select * from tasks where IdProjectParent = '{}'".format(IdProject)
+    #    try:
+    #        cur=self.__conn.cursor()            
+    #        cur.execute(queryStr)
+    #        desc = cur.description
+    #        rows = cur.fetchall()
+    #        cabeceras = tuple([cab[0] for cab in desc])
+    #        return (True,(cabeceras,rows))
+    #    except MySQLdb.Error, e:
+    #        print "Error {0}".format(e)
+    #        return (False, ("Error en get_Task_list",))
+    #    finally:
+    #        if cur:
+    #            cur.close()
+    #===========================================================================
                 
-    def get_task_byId(self, IdProject, IdTask):
+    def get_task_byId(self, IdTask):
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Tasks WHERE IdTask = %s and IdProjectParent = %s", (IdTask,IdProject))
+            cur.execute("SELECT * from Projects WHERE IdProject = %s", IdTask)
             if cur.rowcount == 1:
                 row = cur.fetchone()
                 return (True,row)
@@ -187,8 +190,7 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()    
-    
-    def get_task_entries_timeTotal(self,IdResource,IdProject,IdActivity,IdTask=None):
+    def get_task_entries_timeTotal(self,IdResource,IdProject,IdActivity):
         try:
             cur=self.__conn.cursor()
             if IdTask is not None:
