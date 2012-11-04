@@ -6,17 +6,19 @@ Created on 29/10/2012
 '''
 import MySQLdb
 
-class Project(object):
-    '''
-    Clase que representa una fila en la tabla de proyectos
-    '''
-    def __init__(self,IdP,IdPP,lft,rgt,Code,Description):
-        self.IdP=IdP
-        self.IdPP=IdPP
-        self.lft=lft
-        self.rgt=rgt
-        self.Code=Code
-        self.Description=Description
+#===============================================================================
+# class Project(object):
+#    '''
+#    Clase que representa una fila en la tabla de proyectos
+#    '''
+#    def __init__(self,IdP,IdPP,lft,rgt,Code,Description):
+#        self.IdP=IdP
+#        self.IdPP=IdPP
+#        self.lft=lft
+#        self.rgt=rgt
+#        self.Code=Code
+#        self.Description=Description
+#===============================================================================
 
 class ProjectTree(object):
     '''
@@ -40,18 +42,42 @@ class ProjectTree(object):
             data=cur.fetchall()
             cur.close()
             for row in data:
-                myP=Project(row[0],row[1],row[2],row[3],row[4],row[5])
+                myP=[row[0],row[1],row[2],row[3],row[4],row[5]]
                 self.myProjects[row[0]]=myP
                 self.projFromLft[row[2]]=row[0]
                 self.projFromRgt[row[3]]=row[0]                
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
-        pass
-    
+    def insertNode(self,code,description,parentID):
+        try:
+            cur = self.conn.cursor() 
+            # retrieve left and right value of the root node
+            msgStr="SELECT lft, rgt FROM projects where Idproject = {}".format(parentID)        
+            cur.execute(msgStr)   
+            row = cur.fetchone()
+            cmpVal = row[1]-1
+            msgStr="UPDATE projects SET rgt = rgt + 2 WHERE rgt > {0}".format(cmpVal)
+            cur.execute(msgStr)
+            msgStr="UPDATE projects SET lft = lft + 2 WHERE lft > {0}".format(cmpVal)
+            cur.execute(msgStr)
+            msgStr="""INSERT INTO projects(IdProjectParent,lft,rgt,Code,Description) 
+                        VALUES({0},{1},{2},'{3}','{4}')""".format(parentID,row[1],row[1]+1,code,description)
+            cur.execute(msgStr)                                    
+            cur.close()
+            self.conn.commit()
+            self.updateTree()
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)    
+                 
 if __name__ == "__main__":
     myDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'proj',charset="utf8",use_unicode=True)
     myProjs = ProjectTree(myDB)
     myProjs.updateTree()
+    myProjs.insertNode('PR001', 'OTRA TAREA COLGANDO DE PR001', 50)
+    myKys = myProjs.projFromLft.keys()
+    for lft in myKys:
+        myID=int(myProjs.projFromLft[lft])
+        print lft,myID,myProjs.myProjects[myID]
     pass        
 #===============================================================================
 #    def display_children(self,root):
