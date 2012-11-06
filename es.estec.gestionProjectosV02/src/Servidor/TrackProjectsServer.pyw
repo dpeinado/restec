@@ -20,8 +20,8 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
     Call = dict(
         GET_INFO_ENTRIES=(
             lambda self, *args: self.server.myDataBase.get_info_entries(*args)),                          
-        GET_PROJECT_LIST=(
-            lambda self, *args: self.server.myDataBase.get_project_list(*args)),
+        GET_PROJECT_TREE=(
+            lambda self, *args: self.server.myDataBase.get_project_tree(*args)),
         GET_PROJECT_BYID=(
             lambda self, *args: self.server.myDataBase.get_project_byId(*args)),                
         GET_RESOURCE_LIST=(

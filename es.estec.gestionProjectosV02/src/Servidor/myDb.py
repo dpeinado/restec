@@ -6,6 +6,11 @@ Created on 02/10/2012
 '''
 
 import MySQLdb
+import sys,os
+mypath = os.path.dirname(__file__)
+otherpath=os.path.join(mypath,'..','Common')
+sys.path.append(otherpath)
+import projectsDataModel
 #import sys
 
 class lineaResumen(object):
@@ -35,6 +40,7 @@ class myDb(object):
         self.__userpwd = userpwd
         self.__database = database
         self.__conn=None
+        self.__myPT=projectsDataModel.ProjectTree()
     def connect(self):
         try:
             self.__conn = MySQLdb.connect(host = self.__host,
@@ -43,6 +49,7 @@ class myDb(object):
                                    db = self.__database,
                                    charset="utf8",
                                    use_unicode=True)
+            self.__myPTDB=projectsDataModel.ProjectTreeDB(self.__myPT,self.__conn)
             return True
         except MySQLdb.Error, e:
                 print "Error {0}".format(e)
@@ -60,20 +67,13 @@ class myDb(object):
             
     def conn(self):
         return self.__conn
-    def get_project_list(self):
+    def get_project_tree(self):
         try:
-            cur=self.__conn.cursor()
-            cur.execute("SELECT * from Projects WHERE IdProjectParent = 1 order by Code")
-            desc = cur.description
-            rows = cur.fetchall()
-            cabeceras = tuple([cab[0] for cab in desc])
-            return (True,(cabeceras,rows))
+            self.__myPTDB.updateTree()
+            return (True,self.__myPT)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             return (False, ("Error en get_project_list",))
-        finally:
-            if cur:
-                cur.close()
                                
     def get_project_byId(self, IdProject):
         try:
@@ -190,15 +190,12 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()    
+    
     def get_task_entries_timeTotal(self,IdResource,IdProject,IdActivity):
         try:
             cur=self.__conn.cursor()
-            if IdTask is not None:
-                cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
-                        IdActivity = %s and IdTask = %s""",(IdResource,IdProject,IdActivity,IdTask))
-            else:
-                cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
-                        IdActivity = %s and IdTask is NULL""",(IdResource,IdProject,IdActivity))
+            cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
+                       IdActivity = %s""",(IdResource,IdProject,IdActivity))            
             row = cur.fetchone()
             return (True,row)
         except MySQLdb.Error, e:

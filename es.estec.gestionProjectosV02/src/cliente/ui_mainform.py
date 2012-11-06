@@ -1,9 +1,9 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'mainform.ui'
 #
-# Created: Thu Oct 11 15:13:25 2012
-#      by: PyQt4 UI code generator 4.9.5
+# Created: Tue Nov 06 14:20:47 2012
+#      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -124,11 +124,6 @@ class Ui_MainForm(object):
         self.displayTarea.setText(_fromUtf8(""))
         self.displayTarea.setObjectName(_fromUtf8("displayTarea"))
         self.gridLayout.addWidget(self.displayTarea, 2, 1, 1, 1)
-        self.setTareaButton = QtGui.QPushButton(self.layoutWidget1)
-        self.setTareaButton.setMinimumSize(QtCore.QSize(96, 0))
-        self.setTareaButton.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.setTareaButton.setObjectName(_fromUtf8("setTareaButton"))
-        self.gridLayout.addWidget(self.setTareaButton, 2, 2, 1, 1)
         self.label_4 = QtGui.QLabel(self.layoutWidget1)
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.gridLayout.addWidget(self.label_4, 3, 0, 1, 1)
@@ -181,7 +176,6 @@ class Ui_MainForm(object):
         self.label_2.setText(QtGui.QApplication.translate("MainForm", "Proyecto:", None, QtGui.QApplication.UnicodeUTF8))
         self.setProyectoButton.setText(QtGui.QApplication.translate("MainForm", "Proyecto", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("MainForm", "Tarea:", None, QtGui.QApplication.UnicodeUTF8))
-        self.setTareaButton.setText(QtGui.QApplication.translate("MainForm", "Tarea", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("MainForm", "Actividad:", None, QtGui.QApplication.UnicodeUTF8))
         self.setActividadButton.setText(QtGui.QApplication.translate("MainForm", "Actividad", None, QtGui.QApplication.UnicodeUTF8))
         self.goButton.setText(QtGui.QApplication.translate("MainForm", "Go", None, QtGui.QApplication.UnicodeUTF8))

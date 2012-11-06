@@ -17,8 +17,13 @@ import ui_mainform
 import projectDialog
 import resourceDialog
 import activityDialog
-import taskDialog
+#import taskDialog
 
+import os
+mypath = os.path.dirname(__file__)
+otherpath=os.path.join(mypath,'..','Common')
+sys.path.append(otherpath)
+import projectsDataModel
 
 TIMEINTERVAL = 900000
 
@@ -44,14 +49,12 @@ class MainForm(QDialog,
         if myResource == 'None':
             myResource=None
         myProject = str(settings.value('IdProject').toPyObject())
+        #myProject = None
         if myProject=='None':
             myProject=None
         myActivity = str(settings.value('IdActivity').toPyObject())
         if myActivity =='None':
             myActivity=None
-        myTask = str(settings.value('IdTask').toPyObject())
-        if myTask == 'None':
-            myTask = None
 
         myAddress = [myHost,myPort]
         
@@ -61,15 +64,13 @@ class MainForm(QDialog,
             self.__ready = True
         self.__IdResource = myResource
         self.__IdProject = myProject
-        self.__IdTask = myTask
         self.__IdActivity=myActivity
         self.__Address = myAddress
         self.__timeFromGo = 0
         self.__timeFromLast = 0
         self.__running = False
     
-        self.setupUi(self)
-		
+        self.setupUi(self)	
         self.setWindowFlags(self.windowFlags() | Qt.WindowSystemMenuHint | Qt.WindowMinMaxButtonsHint)
         
         self.goButton.clicked.connect(self.goUpdating)
@@ -78,7 +79,6 @@ class MainForm(QDialog,
         self.setProyectoButton.clicked.connect(self.setProject)
         self.setRecursoButton.clicked.connect(self.setResource)
         self.setActividadButton.clicked.connect(self.setActivity)
-        self.setTareaButton.clicked.connect(self.setTask)
 
         self.stopButton.setEnabled(False)
         self.goButton.setEnabled(False)
@@ -95,36 +95,43 @@ class MainForm(QDialog,
         
     def setProject(self):
         print "Estoy en setProject"
-        ok, data = self.handle_request("GET_PROJECT_LIST")
+        ok, data = self.handle_request("GET_PROJECT_TREE")
         if ok:
-            if len(data)==2:
-                myProjectList = list(data[1])
-                myPD = projectDialog.projectDialog(self.__IdProject, myProjectList, self)
-                if myPD.exec_():
-                    newProjectId = myPD.table.item(myPD.table.currentRow(),0).text()
-                    if newProjectId != self.__IdProject:
-                        self.__IdTask = None
-                        self.__IdProject = newProjectId
-                        self.displayTarea.setText('')
-                    itemText1 = myPD.table.item(myPD.table.currentRow(),1).text()
-                    itemText2 = myPD.table.item(myPD.table.currentRow(),2).text()
-                    msgProject = QString("%1: %2").arg(itemText1).arg(itemText2)
-                    
-                    #msgProject = "{0}: {1}".format(itemText1, itemText2)
-                    self.displayProyecto.setText(msgProject)
-                    if (self.__IdResource is None) or (self.__IdProject is None) \
-                        or (self.__IdActivity is None):
-                        self.__ready = False
-                    else:
-                        self.__ready = True
+            myPT = data
+            #self.__IdProject='2'
+            myPD = projectDialog.projectDialog(self.__IdProject, myPT, self)
+            if myPD.exec_():
+                ntaskid = myPD.tree.currentItem().text(2)
+                self.__IdProject = ntaskid if ntaskid != '1' else None
+                if self.__IdProject is not None:
+                    self.displayProject(self.__IdProject, myPT)
+                if (self.__IdResource is None) or (self.__IdProject is None) \
+                                                or (self.__IdActivity is None):
+                    self.__ready = False
+                else:
+                    self.__ready = True
                 if self.__ready:
                     ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
-                                                   self.__IdResource,self.__IdProject,
-                                                   self.__IdActivity, self.__IdTask)
+                                                  self.__IdResource,self.__IdProject,
+                                                  self.__IdActivity)
                     self.showTimeFromStart.setText(self.getHHMM(data[0]))
-                else:
-                    print "Rechacé"
-        pass
+            else:
+                print "Rechacé"                
+
+    def displayProject(self,idP,myPT):
+        lista=myPT.path_node(int(idP))
+        Cod1 = myPT.myProjects[lista[1]][4]
+        Des1 = myPT.myProjects[lista[1]][5]
+        if len(lista)>2:
+            Cod2 = myPT.myProjects[lista[-1]][4]
+            Des2 = myPT.myProjects[lista[-1]][5]
+        else:
+            Cod2 = ""
+            Des2 = ""
+        msgProject=QString("%1: %2").arg(Cod1).arg(Des1)
+        msgTask =QString("\t%1").arg(Des2)                        
+        self.displayProyecto.setText(msgProject)
+        self.displayTarea.setText(msgTask)
     
     def setResource(self):
         print "Estoy en setResource"
@@ -147,8 +154,8 @@ class MainForm(QDialog,
                 if self.__ready:
                     ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
                                                    self.__IdResource,self.__IdProject,
-                                                   self.__IdActivity, self.__IdTask)
-                    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
+                                                   self.__IdActivity)
+                    self.showTimeFromStart.setText(self.getHHMM(data[0]))      
                 else:
                     print "Rechacé"
         pass    
@@ -172,43 +179,12 @@ class MainForm(QDialog,
                         self.__ready = True
                 if self.__ready:
                     ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
-                                                   self.__IdResource,self.__IdProject,
-                                                   self.__IdActivity, self.__IdTask)
-                    self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
-                else:
-                    print "Rechacé"
-        pass    
-
-    def setTask(self):
-        print "Estoy en setTask"
-        if self.__IdProject is None:
-            return
-        ok, data = self.handle_request("GET_TASK_LIST", self.__IdProject)
-        if ok:
-            if len(data)==2:
-                myTaskList = list(data[1])
-                myTD = taskDialog.taskDialog(self.__IdTask, myTaskList, self.__IdProject,self.displayProyecto.text(), self)
-                if myTD.exec_():
-                    #print myTD.tree.currentItem().text(0), myTD.tree.currentItem().text(1)
-                    ntaskid = myTD.tree.currentItem().text(1)
-                    self.__IdTask = ntaskid if ntaskid != '-1' else None
-                    msgProject = QString("%1").arg(myTD.tree.currentItem().text(0)) if self.__IdTask is not None else ""
-                    self.displayTarea.setText(msgProject)
-                if (self.__IdResource is None) or (self.__IdProject is None) \
-                       or (self.__IdActivity is None):
-                    self.__ready = False
-                else:
-                    self.__ready = True
-                if self.__ready:
-                    ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",
                                                   self.__IdResource,self.__IdProject,
-                                                  self.__IdActivity, self.__IdTask)
+                                                  self.__IdActivity)
                     self.showTimeFromStart.setText(self.getHHMM(data[0]))                        
                 else:
                     print "Rechacé"
-        else:
-            print "problemas ,, not ok"  
-    
+
     def getHHMM(self,timeEntry):
         if timeEntry is None:
             return '00:00'
@@ -226,7 +202,6 @@ class MainForm(QDialog,
         self.exitButton.setEnabled(False)
         self.setProyectoButton.setEnabled(False)
         self.setRecursoButton.setEnabled(False)
-        self.setTareaButton.setEnabled(False)
         self.setActividadButton.setEnabled(False)
         
         QTimer.singleShot(TIMEINTERVAL, self.callback_Entry)
@@ -243,7 +218,6 @@ class MainForm(QDialog,
                 self.showTimeFromGo.setText(self.getHHMM(timeEntry2))
                 self.showTimeFromStart.setText(self.getHHMM(totalTime))
                 print "Desde Go = %{0}\t Duración de esta carga = {1}".format(timeEntry2, timeEntry1)
-                #QMessageBox.warning(self,"","go")
             finally:
                 QTimer.singleShot(TIMEINTERVAL, self.callback_Entry)
                 
@@ -251,12 +225,11 @@ class MainForm(QDialog,
         myRes = self.__IdResource
         myProj = self.__IdProject
         myAct = self.__IdActivity
-        myTask= self.__IdTask
-        ok, data = self.handle_request("SET_NEW_ENTRY",myRes,myProj,myAct,timeEntry,myTask)
+        ok, data = self.handle_request("SET_NEW_ENTRY",myRes,myProj,myAct,timeEntry)
         if not ok:
             QMessageBox.critical(self,"Error","Error sending new Entry")
             self.close()
-        ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct,myTask)
+        ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct)
         print data[0]
         return data[0]
         
@@ -275,11 +248,9 @@ class MainForm(QDialog,
         self.stopButton.setEnabled(False)
         self.exitButton.setEnabled(True)
         self.setProyectoButton.setEnabled(True)
-        self.setRecursoButton.setEnabled(True)
-        self.setTareaButton.setEnabled(True)
+        self.setRecursoButton.setEnabled(True)        
         self.setActividadButton.setEnabled(True)
         self.showTimeFromGo.setText(self.getHHMM(0)) 
-        #QMessageBox.warning(self, 'He llegado a Stop','-Go')
     
     def exitApp(self):
         self.close()
@@ -317,9 +288,8 @@ class MainForm(QDialog,
         myRes = self.__IdResource
         myProj = self.__IdProject
         myAct = self.__IdActivity
-        myTask= self.__IdTask
 
-        ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct,myTask)
+        ok, data = self.handle_request("GET_TASK_ENTRIES_TIMETOTAL",myRes,myProj,myAct)
         if ok:
             if data[0] is not None:
                 tmpTime = data[0]
@@ -327,21 +297,23 @@ class MainForm(QDialog,
                 tmpTime = 0
             self.showTimeFromStart.setText(self.getHHMM(tmpTime))
         
-        
-        ok, data = self.handle_request("GET_PROJECT_BYID", myProj)
+        ok, data = self.handle_request("GET_PROJECT_TREE")
         if ok:
-            if myProj != str(data[0]):
-                msgProject = "Salir del programa INMEDIATAMENTE, IdProjecto = {0}, Valor devuelto = {1}".format(myProj, str(data[0]))
+            myPT = data
+            myK =myPT.myProjects.keys()             
+            if int(myProj) in myK:                
+                self.displayProject(myProj, myPT)
+            else:
+                msgProject = "Salir del programa INMEDIATAMENTE, IdProjecto = {0}".format(myProj)
                 reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
                                              msgProject)
                 raise ValueError, "Error al recuperar el proyecto inicial"
-            msgProject = QString("%1: %2").arg(data[1]).arg(data[2])
-            self.displayProyecto.setText(msgProject)
         else:
-            msgProject = "ERROR en el almacenamiento de los datos iniciales No existe el proyecto = {0}".format(myProj)
-            reply = QMessageBox.warning(self, 'ERROR', msgProject)
-            self.__IdProject=None
-            
+            msgProject = "Salir del programa INMEDIATAMENTE, Error al obtener GET_PROJECT_TREE}"
+            reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
+                                             msgProject)
+            raise ValueError, "Error al recuperar el proyecto inicial"            
+        
         ok, data = self.handle_request("GET_RESOURCE_BYID", myRes)
         if ok:
             if myRes != str(data[0]):
@@ -370,21 +342,6 @@ class MainForm(QDialog,
             reply = QMessageBox.warning(self, 'ERROR',msgProject)
             self.__IdActivity=None
                  
-        if myTask is not None:
-            ok, data = self.handle_request("GET_TASK_BYID", myProj, myTask)
-            if ok:
-                if myTask != str(data[0]):
-                    msgProject = "Salir del programa INMEDIATAMENTE, IdActivity = {0}, Valor devuelto = {1}".format(myTask, str(data[0]))
-                    reply = QMessageBox.warning(self, 'ERROR de consistencia Interna',
-                                             msgProject)
-                    raise ValueError, "Error al recuperar la actividad inicial"
-                msgProject = QString(data[3])
-                self.displayTarea.setText(msgProject)
-            else:   
-                msgProject = "ERROR en el almacenamiento de los datos iniciales No existe la Tarea = {0}".format(myTask)
-                reply = QMessageBox.warning(self, 'ERROR', msgProject)
-                self.__IdTask=None
-
     def closeEvent(self, event):
         if self.__running:
             if self.__timeFromLast > 0:
@@ -400,13 +357,7 @@ class MainForm(QDialog,
 
         settings.setValue("IdResource", (self.__IdResource))
         settings.setValue("IdProject", (self.__IdProject))
-        if self.__IdTask is None:
-            myTask = QVariant()
-        else:
-            myTask = self.__IdTask
-        settings.setValue("IdTask", myTask)
         settings.setValue("IdActivity", (self.__IdActivity))
-        #super(MainForm, self).closeEvent(event)
         print "Aqui estoy"
 
 if __name__ == "__main__":

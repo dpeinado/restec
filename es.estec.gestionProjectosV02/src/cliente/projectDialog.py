@@ -13,18 +13,16 @@ class projectDialog(QDialog):
     '''
     classdocs
     '''
-    def __init__(self, current, myProjectList,parent=None):
+    def __init__(self, current, myProjectTree,parent=None):
         super(projectDialog,self).__init__(parent)
         self.myParent = parent
         self.setMinimumSize(500,200)
-        self.myProjectList = myProjectList
-        self.__current = current
-        self.__numberRows = len(myProjectList)
+        self.myPT = myProjectTree
+        self.__current = current        
         self.__numberCols = 3
-        tableLabel = QLabel("Proyectos")
-        self.table = QTableWidget()
-        #self.myTable=QLineEdit()
-        tableLabel.setBuddy(self.table)
+        treeLabel = QLabel("Proyectos")
+        self.tree = QTreeWidget()                
+        treeLabel.setBuddy(self.tree)
         okButton = QPushButton("&Ok")
         cancelButton = QPushButton("Cancel")
         newButton = QPushButton("Proyecto &Nuevo")
@@ -34,8 +32,8 @@ class projectDialog(QDialog):
         hbox.addStretch()
         hbox.addWidget(newButton)
         layout=QVBoxLayout()
-        layout.addWidget(tableLabel)
-        layout.addWidget(self.table)
+        layout.addWidget(treeLabel)
+        layout.addWidget(self.tree)
         layout.addLayout(hbox)
         self.setLayout(layout)
         
@@ -58,46 +56,45 @@ class projectDialog(QDialog):
             print "Rechacé"
         
     def updateTable(self,current=None):
-        self.table.clear()
-        self.table.setRowCount(len(self.myProjectList)) 
-        self.table.setColumnCount(self.__numberCols) 
-        self.table.setColumnHidden(0,True)
-        self.table.verticalHeader().setVisible(False)
-        tmp1 = QString(u"Código")
-        tmp2 = QString(u"Descripción")
-        self.table.setHorizontalHeaderLabels([QString("Id"), tmp1,  tmp2])
-        self.table.setAlternatingRowColors(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.table.setSelectionMode(QTableWidget.SingleSelection)
-        self.table.setSortingEnabled(False)
+        self.tree.clear()
+        self.tree.setColumnCount(self.__numberCols)
+        #self.tree.setColumnHidden(2,True)
+        self.tree.setHeaderLabels([QString('Codigo'),QString("Descripcion"),QString('IdProj')])
+        self.tree.setEditTriggers(QTreeWidget.NoEditTriggers)
+        self.tree.setSelectionBehavior(QTreeWidget.SelectRows)
+        self.tree.setSelectionMode(QTreeWidget.SingleSelection)
+
+        self.tree.setItemsExpandable(True)
         selected = None
-        for row, project in enumerate(self.myProjectList):
-            val = str(project[0])
-            item = QTableWidgetItem(val)
-            if current is not None and current == val:
-                selected = item           
-            self.table.setItem(row,0,item)
-            val = project[1]
-            item = QTableWidgetItem(val)
-            self.table.setItem(row,1,item)
-            val = project[2]
-            item = QTableWidgetItem(val)
-            self.table.setItem(row,2,item)            
-        self.table.resizeColumnsToContents()
-        self.table.setSortingEnabled(True)
-        self.table.sortItems(1,Qt.AscendingOrder)
-        #self.table.repaint()
+        parentFromTask ={}
+        for row in self.myPT:
+            msg1=QString(row[4])
+            msg2=QString(row[5])
+            msg3=QString(str(row[0]))
+            if row[1] is None:
+                rootNode=QTreeWidgetItem(self.tree,[msg1,msg2,msg3])
+                parentFromTask[row[0]]=rootNode
+                self.tree.expandItem(rootNode)
+                if current is None:
+                    selected = None                
+            else:
+                ancestor=parentFromTask[row[1]]
+                if ancestor is None:
+                    raise ValueError('There is a subproject without parent and is not the root')
+                treeTask = QTreeWidgetItem(ancestor,[msg1,msg2,msg3])
+                parentFromTask[row[0]]=treeTask
+                if current is not None and current == str(row[0]):
+                    selected = treeTask                
+                self.tree.expandItem(treeTask)
+                self.tree.expandItem(ancestor)
+            print row
+        self.tree.resizeColumnToContents(0)
+        self.tree.resizeColumnToContents(1)
+        self.tree.resizeColumnToContents(2)
         if selected is not None:
             selected.setSelected(True)
-            self.table.setCurrentItem(selected)
-            self.table.scrollToItem(selected)    
-        #=======================================================================
-        # self.table.clear()
-        # self.table.setRowCount(len(self.movies))
-        # self.table.setColumnCount(5) 
-        # self.table.setHorizontalHeaderLabels(["Title", "Year", "Mins","Acquired", "Notes"])
-        #=======================================================================
+            self.tree.setCurrentItem(selected)        
+
         
 if __name__ == "__main__":
     app=QApplication(sys.argv)
