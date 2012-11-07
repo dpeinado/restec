@@ -1,8 +1,8 @@
 set character_set_database=UTF8;
-drop database if exists proj;
-create database proj character set 'UTF8';
-grant all on proj.* to 'puser'@'%' identified by 'pu8549';
-use proj;
+drop database if exists projects;
+create database projects character set 'UTF8';
+grant all on projects.* to 'puser'@'%' identified by 'pu8549';
+use projects;
 
 CREATE TABLE IF NOT EXISTS Projects(
 	IdProject INT AUTO_INCREMENT,

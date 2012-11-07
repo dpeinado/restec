@@ -8,9 +8,7 @@ Created on 02/10/2012
 import MySQLdb
 import sys,os
 mypath = os.path.dirname(__file__)
-otherpath=os.path.join(mypath,'..','Common')
-sys.path.append(otherpath)
-import projectsDataModel
+from projectsDataModel import *
 #import sys
 
 class lineaResumen(object):
@@ -33,15 +31,18 @@ class myDb(object):
         
     def __init__(self,host,user,userpwd,database):
         '''
-        Constructor
+        OK V02
         '''
         self.__host = host
         self.__user = user
         self.__userpwd = userpwd
         self.__database = database
         self.__conn=None
-        self.__myPT=projectsDataModel.ProjectTree()
+        self.myPT=ProjectTree()
     def connect(self):
+        '''
+        OK V02
+        '''        
         try:
             self.__conn = MySQLdb.connect(host = self.__host,
                                    user = self.__user,
@@ -49,13 +50,17 @@ class myDb(object):
                                    db = self.__database,
                                    charset="utf8",
                                    use_unicode=True)
-            self.__myPTDB=projectsDataModel.ProjectTreeDB(self.__myPT,self.__conn)
+            self.myPTDB=ProjectTreeDB(self.myPT,self.__conn)
+            #self.myPTDB.rebuild_tree(1, 1)
             return True
         except MySQLdb.Error, e:
                 print "Error {0}".format(e)
                 return False
                 
     def disconnect(self):
+        '''
+        OK V02
+        '''        
         try:
             self.__conn.commit()
             self.__conn.close()
@@ -66,17 +71,24 @@ class myDb(object):
                 return False
             
     def conn(self):
+        '''
+        OK V02
+        '''        
         return self.__conn
+    
     def get_project_tree(self):
+        '''
+        OK V02
+        '''        
         try:
-            self.__myPTDB.updateTree()
-            return (True,self.__myPT)
+            self.myPTDB.updateTree()
+            return (True,self.myPT)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
             return (False, ("Error en get_project_list",))
                                
     def get_project_byId(self, IdProject):
-        try:
+        try:            
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Projects WHERE IdProject = %s", (IdProject,))
             if cur.rowcount == 1:
@@ -91,7 +103,32 @@ class myDb(object):
             if cur:
                 cur.close()                
     
+    def set_new_project(self, Parent, Code, Description):
+        nivel = self.myPT.path_node(int(Parent))
+        if len(nivel)==1:        
+            if self.myPT.existCode(Code):            
+                return (False, "Proyecto existente con este mismo código","Estas fastidiado")
+        newNode=self.myPTDB.insertNode(Code,Description,Parent)
+        return (True, newNode, self.myPT)
+    def get_task_entries_timeTotal(self,IdResource,IdProject,IdActivity):
+        try:
+            cur=self.__conn.cursor()
+            cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
+                       IdActivity = %s""",(IdResource,IdProject,IdActivity))            
+            row = cur.fetchone()
+            return (True,row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            return (False, ("Error en get_task_entries_timeTotal"))
+        finally:
+            if cur:
+                cur.close()
+                
+                                
     def get_resource_list(self):
+        '''
+        OK V02
+        '''        
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Resources")
@@ -107,6 +144,9 @@ class myDb(object):
                 cur.close()
     
     def get_resource_byId(self, IdResource):
+        '''
+        OK V02
+        '''        
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Resources WHERE IdResource = %s", (IdResource,))
@@ -121,8 +161,35 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()    
+    def set_new_resource(self, Name, Cost):
+        '''
+        OK V02
+        '''        
+        try:
+            if Cost is None:
+                Cost = 0.0;
+            cur=self.__conn.cursor()
+            cur.execute("SELECT * from Resources WHERE Name LIKE %s", (unicode(Name,)))
+            if cur.rowcount > 0:
+                return (False, ("Recurso existente con este mismo Nombre",))
+            # Parece que no existe un recurso igual ... luego inserto
+            cur.execute ("INSERT INTO Resources(Name, Cost) VALUES(%s,%s)",(unicode(Name),Cost))
+            self.__conn.commit()
+            cur.execute("select * from resources where Name like %s",(unicode(Name,)))
+            row=cur.fetchone()
+            return (True, row)
+        except MySQLdb.Error, e:
+            print "Error {0}".format(e)
+            self.__conn.rollback()
+            return (False, ("Error en set_new_resource",))
+        finally:
+            if cur:
+                cur.close()
  
     def get_activity_list(self):
+        '''
+        OK V02
+        '''        
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Activities")
@@ -138,6 +205,9 @@ class myDb(object):
                 cur.close()
                 
     def get_activity_byId(self, IdResource):
+        '''
+        OK V02
+        '''        
         try:
             cur=self.__conn.cursor()
             cur.execute("SELECT * from Activities WHERE IdActivity = %s", (IdResource,))
@@ -153,57 +223,32 @@ class myDb(object):
             if cur:
                 cur.close()    
 
-
-    #===========================================================================
-    # def get_task_list(self, IdProject=None):
-    #    if IdProject is None:
-    #        queryStr = "SELECT * from Tasks"
-    #    else:
-    #        queryStr = "select * from tasks where IdProjectParent = '{}'".format(IdProject)
-    #    try:
-    #        cur=self.__conn.cursor()            
-    #        cur.execute(queryStr)
-    #        desc = cur.description
-    #        rows = cur.fetchall()
-    #        cabeceras = tuple([cab[0] for cab in desc])
-    #        return (True,(cabeceras,rows))
-    #    except MySQLdb.Error, e:
-    #        print "Error {0}".format(e)
-    #        return (False, ("Error en get_Task_list",))
-    #    finally:
-    #        if cur:
-    #            cur.close()
-    #===========================================================================
-                
-    def get_task_byId(self, IdTask):
+    def set_new_activity(self, Activity):
+        '''
+        OK V02
+        '''        
         try:
             cur=self.__conn.cursor()
-            cur.execute("SELECT * from Projects WHERE IdProject = %s", IdTask)
-            if cur.rowcount == 1:
-                row = cur.fetchone()
-                return (True,row)
-            else:
-                return(False,())
+            cur.execute("SELECT * from Activities WHERE Activity LIKE %s", (unicode(Activity,)))
+            if cur.rowcount > 0:
+                return (False, ("Fase existente con este mismo Nombre",))
+            # Parece que no existe una actividad igual ... luego inserto            
+            cur.execute ("INSERT INTO Activities(Activity) VALUES(%s)",(unicode(Activity,)))
+            self.__conn.commit()
+            cur.execute("select * from Activities where Activity like %s",(unicode(Activity,)))
+            row=cur.fetchone()
+            return (True, row)
         except MySQLdb.Error, e:
             print "Error {0}".format(e)
-            return (False, ("Error en get_task_byId", IdTask))
-        finally:
-            if cur:
-                cur.close()    
-    
-    def get_task_entries_timeTotal(self,IdResource,IdProject,IdActivity):
-        try:
-            cur=self.__conn.cursor()
-            cur.execute("""SELECT SUM(Tsec) from Entries where IdResource = %s and IdProject = %s and
-                       IdActivity = %s""",(IdResource,IdProject,IdActivity))            
-            row = cur.fetchone()
-            return (True,row)
-        except MySQLdb.Error, e:
-            print "Error {0}".format(e)
-            return (False, ("Error en get_task_entries_timeTotal"))
+            self.__conn.rollback()
+            return (False, ("Error en set_new_activity",))
         finally:
             if cur:
                 cur.close()
+                
+ 
+
+  
     def get_info_entries(self):
         try:
             cur=self.__conn.cursor()
@@ -299,101 +344,6 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()
-                
-    def set_new_project(self, Code, Description):
-        try:
-            cur=self.__conn.cursor()
-            cur.execute("SELECT * from Projects WHERE Code = %s", (Code,))
-            if cur.rowcount > 0:
-                return (False, ("Proyecto existente con este mismo código",))
-            cur.execute("SELECT * from Projects WHERE Description LIKE %s", (unicode(Description),))
-            if cur.rowcount > 0:
-                return (False, ("Proyecto existente con esta misma descripción",))
-            # Parece que no existe un proyecto igual ... luego inserto
-            cur.execute ("INSERT INTO Projects(Code,Description) VALUES(%s,%s)",(Code,unicode(Description)))
-            self.__conn.commit()
-            cur.execute("select * from Projects where Code = %s",(Code,))
-            row = cur.fetchone()
-            return (True, row)
-        except MySQLdb.Error, e:
-            print "Error {0}".format(e)
-            self.__conn.rollback()
-            return (False, ("Error en set_new_project",))
-        finally:
-            if cur:
-                cur.close()
-    def set_new_resource(self, Name, Cost):
-        try:
-            if Cost is None:
-                Cost = 0.0;
-            cur=self.__conn.cursor()
-            cur.execute("SELECT * from Resources WHERE Name LIKE %s", (unicode(Name,)))
-            if cur.rowcount > 0:
-                return (False, ("Recurso existente con este mismo Nombre",))
-            # Parece que no existe un recurso igual ... luego inserto
-            cur.execute ("INSERT INTO Resources(Name, Cost) VALUES(%s,%s)",(unicode(Name),Cost))
-            self.__conn.commit()
-            cur.execute("select * from resources where Name like %s",(unicode(Name,)))
-            row=cur.fetchone()
-            return (True, row)
-        except MySQLdb.Error, e:
-            print "Error {0}".format(e)
-            self.__conn.rollback()
-            return (False, ("Error en set_new_resource",))
-        finally:
-            if cur:
-                cur.close()
-                
-                
-    def set_new_activity(self, Activity):
-        try:
-            cur=self.__conn.cursor()
-            cur.execute("SELECT * from Activities WHERE Activity LIKE %s", (unicode(Activity,)))
-            if cur.rowcount > 0:
-                return (False, ("Fase existente con este mismo Nombre",))
-            # Parece que no existe una actividad igual ... luego inserto            
-            cur.execute ("INSERT INTO Activities(Activity) VALUES(%s)",(unicode(Activity,)))
-            self.__conn.commit()
-            cur.execute("select * from Activities where Activity like %s",(unicode(Activity,)))
-            row=cur.fetchone()
-            return (True, row)
-        except MySQLdb.Error, e:
-            print "Error {0}".format(e)
-            self.__conn.rollback()
-            return (False, ("Error en set_new_activity",))
-        finally:
-            if cur:
-                cur.close()
-
-    def set_new_task(self, IdProjectParent, IdTaskParent, Task):
-        try:
-            cur=self.__conn.cursor()
-            cur.execute("SELECT * from Tasks WHERE Task LIKE %s and IdProjectParent = %s", (Task,IdProjectParent))
-            if cur.rowcount > 0:
-                return (False, ("Tarea existente con este mismo Nombre en el mismo proyecto",))
-            # Parece que no existe una fase igual ... luego inserto
-            cur.execute("SELECT * from Projects where IdProject = %s",(IdProjectParent,))
-            if cur.rowcount == 0:
-                return (False, ("Error IdProjectParent Inexistente",))
-            if IdTaskParent is not None:
-                cur.execute("SELECT * from Tasks where IdTask = %s",(IdTaskParent,))
-                if cur.rowcount == 0:
-                    return (False, ("Error IdTaskParent Inexistente",))
-            cur.execute ("INSERT INTO Tasks(IdProjectParent,IdTaskParent,Task) VALUES(%s,%s,%s)",(IdProjectParent,IdTaskParent,unicode(Task)))
-            self.__conn.commit()
-            if IdTaskParent is None:
-                cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent IS NULL and Task = %s",(IdProjectParent,unicode(Task)))
-            else:
-                cur.execute("select * from tasks where IdProjectParent = %s and IdTaskParent = %s and Task = %s",(IdProjectParent,IdTaskParent,unicode(Task)))
-            row=cur.fetchone()
-            return (True, row)
-        except MySQLdb.Error, e:
-            print "Error {0}".format(e)
-            self.__conn.rollback()
-            return (False, ("Error en set_new_task",))
-        finally:
-            if cur:
-                cur.close()
 
     def set_new_entry(self, IdResource,IdProject,IdActivity,Tsec, IdTask=None):
         try:
@@ -415,51 +365,3 @@ class myDb(object):
         finally:
             if cur:
                 cur.close()
-
-#===============================================================================
-# 
-# def print_tuples(data):
-# for detail in data[0]:
-#     print detail, "\t",
-# print
-# for row in data[1]:
-#     for detail in row:
-#         print detail, "\t",
-#     print    
-#     
-# def main():
-# InPr = myDb('localhost', 'puser','pu8549','projects')
-# InPr.connect()
-# print "me conecté"
-# 
-# #ok, lista = InPr.set_new_task('1', None, 'Esta es una tarea con TaskParent = None') 
-# ok, lista = InPr.set_new_task('102', '2', 'Esta es una tarea con TaskParent = 2')
-# print_tuples(lista)
-# for i in range(10):
-#    ok,lista = InPr.set_new_task('2', '1', '5', '400')
-#    
-# for i in range(7):
-#    ok,lista = InPr.set_new_task('2', '5', '4', '308')
-# 
-# for i in range(10):
-#    ok,lista = InPr.set_new_task('3', '5', '6', '285')
-# 
-# ok,lista = InPr.get_task_list(0)
-# print_tuples(lista)
-# ok,lista = InPr.get_task_list(1)
-# print_tuples(lista)
-# ok,lista = InPr.get_task_list(2)
-# print_tuples(lista)
-# ok,lista = InPr.get_task_list(3)
-# print_tuples(lista)
-# ok,lista = InPr.get_task_list(4)
-# print_tuples(lista)
-# ok,lista = InPr.get_task_list(5)
-# print_tuples(lista)
-# ok,lista = InPr.get_task_list(6)
-# print_tuples(lista)
-#  
-# InPr.disconnect()
-# print "me desconecté"
-# main()
-#===============================================================================

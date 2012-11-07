@@ -21,7 +21,7 @@ import activityDialog
 
 import os
 mypath = os.path.dirname(__file__)
-otherpath=os.path.join(mypath,'..','Common')
+otherpath=os.path.join(mypath,'..','Servidor')
 sys.path.append(otherpath)
 import projectsDataModel
 
@@ -72,6 +72,8 @@ class MainForm(QDialog,
     
         self.setupUi(self)	
         self.setWindowFlags(self.windowFlags() | Qt.WindowSystemMenuHint | Qt.WindowMinMaxButtonsHint)
+        self.setWindowTitle(u'Imputación de horas a proyectos')
+        
         
         self.goButton.clicked.connect(self.goUpdating)
         self.stopButton.clicked.connect(self.stopUpdating)
@@ -101,6 +103,7 @@ class MainForm(QDialog,
             #self.__IdProject='2'
             myPD = projectDialog.projectDialog(self.__IdProject, myPT, self)
             if myPD.exec_():
+                myPT = myPD.myPT
                 ntaskid = myPD.tree.currentItem().text(2)
                 self.__IdProject = ntaskid if ntaskid != '1' else None
                 if self.__IdProject is not None:
@@ -190,7 +193,7 @@ class MainForm(QDialog,
             return '00:00'
         prueba1 = str(datetime.timedelta(seconds=timeEntry)).split('.')[0]
         prueba2 = prueba1.split(':')
-        prueba3 = ':'.join(prueba2[0:2])
+        prueba3 = ':'.join(prueba2[0:3])
         return prueba3
     
     def goUpdating(self):

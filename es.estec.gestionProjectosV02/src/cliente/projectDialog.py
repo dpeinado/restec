@@ -17,6 +17,7 @@ class projectDialog(QDialog):
         super(projectDialog,self).__init__(parent)
         self.myParent = parent
         self.setMinimumSize(500,200)
+        self.setWindowTitle('Selección del Proyecto/Tarea')
         self.myPT = myProjectTree
         self.__current = current        
         self.__numberCols = 3
@@ -25,7 +26,7 @@ class projectDialog(QDialog):
         treeLabel.setBuddy(self.tree)
         okButton = QPushButton("&Ok")
         cancelButton = QPushButton("Cancel")
-        newButton = QPushButton("Proyecto &Nuevo")
+        newButton = QPushButton("Proyecto/Tarea &Nuevo")
         hbox = QHBoxLayout()
         hbox.addWidget(okButton)
         hbox.addWidget(cancelButton)
@@ -44,14 +45,26 @@ class projectDialog(QDialog):
         self.updateTable(self.__current)
         
     def makeNewProject(self):
-        myNPD = newProject.newProjectDlg( self.myProjectList, self)
+        currPID=self.tree.currentItem().text(2)
+        myProj=self.myPT.myProjects[int(currPID)]
+        if len(self.myPT.path_node(myProj[0]))==1:
+            isProject=True
+        else:
+            isProject=False
+        myNPD = newProject.newProjectDlg(self.myPT, isProject, self)
         if myNPD.exec_():
-            ncode = myNPD.myCode.text()
+            pass
+            if isProject:
+                ncode = myNPD.myCode.text()
+            else:
+                ncode = myProj[4]
             ndesc = myNPD.myDesc.text()
-            ok, data = self.myParent.handle_request("SET_NEW_PROJECT",ncode,ndesc)
+            nparent = myProj[0]
+            ok, newNode, newPT = self.myParent.handle_request("SET_NEW_PROJECT",nparent,ncode,ndesc)
             if ok:
-                self.myProjectList.append(data)
-                self.updateTable(str(data[0]))
+                current=str(newNode[0])
+                self.myPT=newPT
+                self.updateTable(current) 
         else:
             print "Rechacé"
         
@@ -66,28 +79,28 @@ class projectDialog(QDialog):
 
         self.tree.setItemsExpandable(True)
         selected = None
-        parentFromTask ={}
-        for row in self.myPT:
+        self.parentFromTask ={}        
+        for row in self.myPT:        
             msg1=QString(row[4])
             msg2=QString(row[5])
             msg3=QString(str(row[0]))
             if row[1] is None:
                 rootNode=QTreeWidgetItem(self.tree,[msg1,msg2,msg3])
-                parentFromTask[row[0]]=rootNode
+                self.parentFromTask[row[0]]=rootNode
                 self.tree.expandItem(rootNode)
                 if current is None:
                     selected = None                
             else:
-                ancestor=parentFromTask[row[1]]
+                ancestor=self.parentFromTask[row[1]]
                 if ancestor is None:
                     raise ValueError('There is a subproject without parent and is not the root')
                 treeTask = QTreeWidgetItem(ancestor,[msg1,msg2,msg3])
-                parentFromTask[row[0]]=treeTask
+                self.parentFromTask[row[0]]=treeTask
                 if current is not None and current == str(row[0]):
                     selected = treeTask                
                 self.tree.expandItem(treeTask)
                 self.tree.expandItem(ancestor)
-            print row
+            #print row
         self.tree.resizeColumnToContents(0)
         self.tree.resizeColumnToContents(1)
         self.tree.resizeColumnToContents(2)

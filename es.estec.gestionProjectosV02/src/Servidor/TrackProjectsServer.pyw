@@ -60,8 +60,13 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
         size_data = self.rfile.read(SizeStruct.size)
         size = SizeStruct.unpack(size_data)[0]
         data = pickle.loads(self.rfile.read(size))
-
         try:
+            if not self.server.myDataBase.connect():
+                sys.exit(1)
+            print "Server conectado"
+        except Exception as err:
+            print("ERROR", err)        
+        try:            
             function = self.Call[data[0]]
             reply = function(self, *data[1:])
         except Finish:
@@ -69,8 +74,8 @@ class MyDbServerManagerRequestHandler(SocketServer.StreamRequestHandler):
         data = pickle.dumps(reply, 0)
         self.wfile.write(SizeStruct.pack(len(data)))
         self.wfile.write(data)
-        
-        
+        self.server.myDataBase.disconnect()
+        print "Server desconectado"
     def shutdown(self, *ignore):
         self.server.shutdown()
         self.server.myDataBase.disconnect()
@@ -93,14 +98,14 @@ if __name__ == "__main__":
     try:
         server = ThreadServer((host,port), MyDbServerManagerRequestHandler)
         server.myDataBase=myDb.myDb(host, 'puser','pu8549','proj')
-        if not server.myDataBase.connect():
-            sys.exit(1)
-        print "Server a la escucha"
+        #=======================================================================
+        # if not server.myDataBase.connect():
+        #    sys.exit(1)
+        # print "Server a la escucha"
+        #=======================================================================
         #ok, data = server.myDataBase.get_info_entries()        
         server.serve_forever()
     except Exception as err:
         print("ERROR", err)
     finally:
         print "Estoy en Finally"
-        if server.myDataBase.conn() is not None:
-            server.myDataBase.disconnect()
