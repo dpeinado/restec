@@ -99,7 +99,7 @@ class ProjectTree(object):
     def __iter__(self):
         pass
         myPrs=self.myProjects.values()
-        myPrs.sort(key = operator.itemgetter(1,4))
+        myPrs.sort(key = operator.itemgetter(4,1,2))
         for prj in myPrs:
             yield prj
         
@@ -110,10 +110,17 @@ class ProjectTree(object):
         #    yield self.myProjects[self.projFromLft[lft]]
         #=======================================================================
 
+    def displayTree(self):
+        for proj in myProjs:
+            if proj[1]==None:
+                idRoot=proj[0]
+            if proj[1]==idRoot:
+                myProjs.displayChildren(proj[0])        
     def displayChildren(self,root):
         lft=self.myProjects[root][2]
         rgt=self.myProjects[root][3]
-        myKys=self.projFromLft.keys().sort()
+        myKys=self.projFromLft.keys()
+        myKys.sort()
         myKeys=[e for e in myKys if (e>=lft and e<=rgt)]
         right=[]
         for key in myKeys:
@@ -125,6 +132,8 @@ class ProjectTree(object):
             print msgStr
             right.append(row[3])
     def path_node(self,node):
+        if not (node in self.myProjects.keys()):
+            return []        
         lft=self.myProjects[node][2]
         rgt=self.myProjects[node][3]
         myKys=self.projFromLft.keys()
@@ -147,16 +156,20 @@ class ProjectTree(object):
                 return True
         return False
     
-#===============================================================================
-# if __name__ == "__main__":
-#   myDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'proj',charset="utf8",use_unicode=True)
-#   myProjs = ProjectTree()
-#   myProjsDB = ProjectTreeDB(myProjs,myDB)
-#   myProjsDB.updateTree()
-#   myProjs.displayChildren(1)
-#   print myProjs.existCode('PR002')
-#   print myProjs.path_node(76L)
-#   print myProjs.numberDescendents(34)
-#   print myProjs.getLeaves()
-#               
-#===============================================================================
+if __name__ == "__main__":
+    myDB=MySQLdb.connect(host = 'bicho', user = 'puser', passwd = 'pu8549', db = 'projects',charset="utf8",use_unicode=True)
+    myProjs = ProjectTree()
+    myProjsDB = ProjectTreeDB(myProjs,myDB)
+    #myProjsDB.rebuild_tree(1,1)
+    myProjsDB.updateTree()
+    #myProjs.displayChildren(1)
+
+    myProjs.displayTree()
+
+ #==============================================================================
+ # print myProjs.existCode('PR002')
+ # print myProjs.path_node(51L)
+ # print myProjs.numberDescendents(34)
+ # print myProjs.getLeaves()
+ #==============================================================================
+              

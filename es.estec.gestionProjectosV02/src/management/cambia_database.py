@@ -48,8 +48,8 @@ def rebuild_tree(cur, parent, left):
 def main():
     
     try:
-        newDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'projects',charset="utf8",use_unicode=True)
-        oldDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'oldprojects',charset="utf8",use_unicode=True)
+        newDB=MySQLdb.connect(host = 'bicho', user = 'puser', passwd = 'pu8549', db = 'projects',charset="utf8",use_unicode=True)
+        oldDB=MySQLdb.connect(host = 'bicho', user = 'puser', passwd = 'pu8549', db = 'oldprojects',charset="utf8",use_unicode=True)
     except MySQLdb.Error, e:
         print "Error {0}".format(e)
         sys.exit(1)
@@ -87,7 +87,7 @@ def main():
  
         curOld.execute("select * from tasks order by idprojectparent, idtaskparent")
         data = curOld.fetchall()
-        idP = 50
+        idP = 51
         oldIndexes = {}
         for entrada in data:
             if entrada[2] is None:

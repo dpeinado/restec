@@ -275,7 +275,7 @@ def get_entries(myP):
     pass        
     
 if __name__ == "__main__":
-    myDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'proj',charset="utf8",use_unicode=True)
+    myDB=MySQLdb.connect(host = 'localhost', user = 'puser', passwd = 'pu8549', db = 'projects',charset="utf8",use_unicode=True)
     myProjs = projectsTree(myDB)    
     #===========================================================================
     myProjs.rebuild_tree(1, 1)

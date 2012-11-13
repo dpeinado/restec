@@ -20,9 +20,9 @@ import activityDialog
 #import taskDialog
 
 import os
-mypath = os.path.dirname(__file__)
-otherpath=os.path.join(mypath,'..','Servidor')
-sys.path.append(otherpath)
+# mypath = os.path.dirname(__file__)
+# otherpath=os.path.join(mypath,'..','Servidor')
+# sys.path.append(otherpath)
 import projectsDataModel
 
 TIMEINTERVAL = 900000
